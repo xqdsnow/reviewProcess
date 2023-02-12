@@ -1,0 +1,15 @@
+//node.scss
+.add-node {
+    width: 30px;
+    height: 30px;
+    border-radius:50%;
+    background-color: #BFBFBF;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    position: absolute;
+    .dom-icon{
+        font-size: 20px;
+    }
+  }
+  

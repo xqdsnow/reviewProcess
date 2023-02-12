@@ -1,4 +1,5 @@
 import { Node } from "butterfly-dag";
+import { getCipherInfo } from "crypto";
 import "./node.scss";
 import "./../sty/style.scss"
 
@@ -11,10 +12,12 @@ class BaseNode extends Node {
     this.options = opts;
   }
   mounted() {
+    // console.log(this.dom)
     $(this.dom).on("click", (e) => {
       this.emit("system.node.click.one", {
         node: this,
       });
+      // console.log(e)
     });
   }
   draw = (opts: {
@@ -31,13 +34,13 @@ class BaseNode extends Node {
           ) => string | number | boolean);
     };
   }) => {
-    let container = $(`<div class="send-node def"></div>`)
+    let container = $(`<div class="init-node def"></div>`)
       .css("top", this.top + "px")
       .css("left", this.left + "px")
       .attr("id", (this.id = opts.id));
-    let header = $(`<div class='send-node-head def-head'></div>`);
-    let header_left = $(`<div class='send-node-head-left def-head-left'></div>`);
-    let header_right = $(`<div class='send-node-head-right def-head-right'></div>`);
+    let header = $(`<div class='init-node-head def-head'></div>`);
+    let header_left = $(`<div class='init-node-head-left def-head-left'></div>`);
+    let header_right = $(`<div class='init-node-head-right def-head-right'></div>`);
     container.text("发起人");
     container.text(opts.options.label);
     container.append(header);

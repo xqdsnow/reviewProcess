@@ -15,6 +15,7 @@ class BaseNode extends Node {
       this.emit("system.node.click.one", {
         node: this,
       });
+      // console.log(e)
     });
   }
   draw = (opts: {
@@ -31,13 +32,13 @@ class BaseNode extends Node {
           ) => string | number | boolean);
     };
   }) => {
-    let container = $(`<div class="send-node def"></div>`)
+    let container = $(`<div class="review-node def"></div>`)
       .css("top", this.top + "px")
       .css("left", this.left + "px")
       .attr("id", (this.id = opts.id));
-    let header = $(`<div class='send-node-head def-head'></div>`);
-    let header_left = $(`<div class='send-node-head-left def-head-left'></div>`);
-    let header_right = $(`<div class='send-node-head-right def-head-right'></div>`);
+    let header = $(`<div class='review-node-head def-head'></div>`);
+    let header_left = $(`<div class='review-node-head-left def-head-left'></div>`);
+    let header_right = $(`<div class='review-node-head-right def-head-right'></div>`);
     container.text("发起人");
     container.text(opts.options.label);
     container.append(header);
