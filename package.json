@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "butterfly-dag": "^4.3.18",
+    "butterfly-vue": "^1.0.22",
     "express": "^4.18.2",
     "jquery": "^3.6.3",
     "scss": "^0.2.4",

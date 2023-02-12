@@ -1,4 +1,5 @@
 import { Node } from "butterfly-dag";
+import { getCipherInfo } from "crypto";
 import "./node.scss";
 
 class BaseNode extends Node {
@@ -8,6 +9,14 @@ class BaseNode extends Node {
     this.top = opts.x;
     this.left = opts.y;
     this.options = opts;
+  }
+  mounted() {
+    $(this.dom).on("click", (e) => {
+      this.emit("system.node.click.one", {
+        node: this,
+      });
+      // console.log(e)
+    });
   }
   draw = (opts: {
     id: any;
@@ -37,8 +46,8 @@ class BaseNode extends Node {
     header.append(header_left);
     header.append(header_right);
 
-    header_left.text('所有人');
-    header_right.text('>');
+    header_left.text("所有人");
+    header_right.text(">");
     return container[0];
   };
 }
