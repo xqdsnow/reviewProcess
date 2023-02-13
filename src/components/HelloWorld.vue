@@ -11,7 +11,6 @@ import NodeClassReview from "./utils/nodeReview/node";
 import NodeClassSend from "./utils/nodeSend/node";
 // import NodeClassAdd from "./utils/nodeAdd/node";
 
-
 import EdgeClass from "./edge/addEdge/edge";
 const appCan = ref(null);
 
@@ -31,13 +30,13 @@ onMounted(() => {
       label: "发起人",
       x: 200,
       y: 200,
-      type:'init',
+      type: "init",
       Class: NodeClassInit,
     },
     {
       id: "3",
       label: "审核人",
-      type:'review',
+      type: "review",
       x: 200,
       y: 600,
       Class: NodeClassReview,
@@ -45,37 +44,37 @@ onMounted(() => {
     {
       id: "4",
       label: "抄送人",
-      type:'cc',
+      type: "cc",
       x: 400,
       y: 400,
       Class: NodeClassSend,
-    }
+    },
   ];
   let edges = [
     {
-      id:'e1',
+      id: "e1",
       source: "1",
       target: "2",
-      label:'12',
-      Class:EdgeClass
+      label: "12",
+      Class: EdgeClass,
     },
     {
-      id:'e2',
+      id: "e2",
       source: "1",
       target: "3",
-      Class:EdgeClass
+      Class: EdgeClass,
     },
     {
-      id:'e3',
+      id: "e3",
       source: "2",
       target: "4",
-      Class:EdgeClass
+      Class: EdgeClass,
     },
     {
-      id:'e4',
+      id: "e4",
       source: "3",
       target: "4",
-      Class:EdgeClass
+      Class: EdgeClass,
     },
   ];
   let canvas = new Canvas({
@@ -88,26 +87,14 @@ onMounted(() => {
     {
       nodes: nodes, //节点信息
       edges: edges,
-    },
-    // () => {
-    //   canvas.setGridMode(true, {
-    //     isAdsorb: true, // 是否自动吸附,默认关闭
-    //     theme: {
-    //       shapeType: "line", // 展示的类型，支持line & circle
-    //       gap: 70, // 网格间隙
-    //       background: " #e9e9eb", // 网格背景颜色
-    //       circleRadiu: 0.5, // 圆点半径
-    //       circleColor: " #dedfe0", // 圆点颜色
-    //     },
-    //   });
-    // }
+    }
   );
   canvas.on("system.node.click", (data: any) => {
     console.log(data);
   });
-  canvas.on("system.link.click",(data:any) => {
-    console.log(data);
-  })
+  canvas.on("getAdd", (data: any) => {
+    console.log(data)
+  });
 });
 </script>
 <style scoped>

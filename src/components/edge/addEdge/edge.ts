@@ -10,14 +10,7 @@ class addEdge extends Edge {
   /**
    * 线段挂载后的回调
    */
-   mounted() {
-    // console.log(this.dom)
-    $(this.dom).on("click", (e) => {
-      this.emit("system.link.click", {
-        edge: this,
-      });
-      // console.log(e)
-    });
+  mounted() {
   }
   /**
    * 线段是否能连接的方法
@@ -45,11 +38,15 @@ class addEdge extends Edge {
    * @return {dom} - 返回注释渲染dom的根节点
    */
   drawLabel() {
-    let addDom = $(`<div class="add-node"></div>`);
-    let addDomIcon = $(`<div class='dom-icon'><div>`);
-    addDom.append(addDomIcon);
-    addDomIcon.text("+");
-    return addDom[0];
+    this.addDom = $(`<div class="add-node"><div class='dom-icon'>+<div></div>`)
+    .css('cursor','pointer');
+    let icon = this.addDom.children(".dom-icon");
+    icon.on("click", (e) => {
+      this.emit("getAdd", {
+        node:this
+      });
+    });
+    return this.addDom[0];
   }
 
   /**
