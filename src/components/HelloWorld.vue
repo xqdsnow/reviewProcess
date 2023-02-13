@@ -9,7 +9,7 @@ import "butterfly-dag/dist/index.css";
 import NodeClassInit from "./utils/nodeInit/node";
 import NodeClassReview from "./utils/nodeReview/node";
 import NodeClassSend from "./utils/nodeSend/node";
-// import NodeClassAdd from "./utils/nodeAdd/node";
+import NodeClassEnd from "./utils/nodeEnd/node";
 
 import EdgeClass from "./edge/addEdge/edge";
 const appCan = ref(null);
@@ -24,31 +24,36 @@ onMounted(() => {
       y: 400,
       Class: NodeClassInit,
       head: "123",
-    },
-    {
-      id: "2",
-      label: "发起人",
-      x: 200,
-      y: 200,
-      type: "init",
-      Class: NodeClassInit,
-    },
-    {
-      id: "3",
-      label: "审核人",
-      type: "review",
-      x: 200,
-      y: 600,
-      Class: NodeClassReview,
-    },
-    {
-      id: "4",
-      label: "抄送人",
-      type: "cc",
+    },{
+      id:'2',
       x: 400,
       y: 400,
-      Class: NodeClassSend,
-    },
+      Class: NodeClassEnd
+    }
+    // {
+    //   id: "2",
+    //   label: "发起人",
+    //   x: 200,
+    //   y: 200,
+    //   type: "init",
+    //   Class: NodeClassInit,
+    // },
+    // {
+    //   id: "3",
+    //   label: "审核人",
+    //   type: "review",
+    //   x: 200,
+    //   y: 600,
+    //   Class: NodeClassReview,
+    // },
+    // {
+    //   id: "4",
+    //   label: "抄送人",
+    //   type: "cc",
+    //   x: 400,
+    //   y: 400,
+    //   Class: NodeClassSend,
+    // },
   ];
   let edges = [
     {

@@ -1,0 +1,19 @@
+//node.scss
+.end-node {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  .end-node-head {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #BFBFBF;
+  }
+  .end-node-bottom {
+    position: relative;
+    width: 70px;
+    color: #BFBFBF;
+    font-size: 14px;
+    left: -25px;
+  }
+}
