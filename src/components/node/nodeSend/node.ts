@@ -58,6 +58,7 @@ class BaseNode extends Node {
     del.on("click", (e) => {
       this.emit("getDel", {
         nodedel: this,
+        delId: this.id,
       });
     });
     return container[0];

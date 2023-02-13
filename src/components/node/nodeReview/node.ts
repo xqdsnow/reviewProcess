@@ -16,7 +16,6 @@ class BaseNode extends Node {
       this.emit("system.node.click.one", {
         node: this,
       });
-      // console.log(e)
     });
   }
   draw = (opts: {
@@ -58,7 +57,8 @@ class BaseNode extends Node {
     header_right.text(">");
     del.on("click", (e) => {
       this.emit("getDel", {
-        nodedel:this
+        nodedel: this,
+        delId: this.id,
       });
     });
 

@@ -48,12 +48,12 @@ class BaseNode extends Node {
 
     header_left.text("所有人");
     header_right.text(">");
-    
-    del.on("click", (e) => {
-      this.emit("getDel", {
-        nodedel:this
-      });
-    });
+
+    // del.on("click", (e) => {
+    //   this.emit("getDel", {
+    //     nodedel:this
+    //   });
+    // });
 
     return container[0];
   };

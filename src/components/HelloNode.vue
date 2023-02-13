@@ -1,6 +1,6 @@
 <template>
   <div ref="appCan" id="container" class="container"></div>
-  <el-dialog
+  <!-- <el-dialog
     v-model="dialogVisible"
     title="Tips"
     width="30%"
@@ -15,11 +15,11 @@
         </el-button>
       </span>
     </template>
-  </el-dialog>
+  </el-dialog> -->
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { ElMessageBox } from 'element-plus'
+import { ref, onMounted, reactive } from "vue";
+// import { ElMessageBox } from 'element-plus'
 
 import { Canvas, Node } from "butterfly-dag";
 import "butterfly-dag/dist/index.css";
@@ -30,19 +30,41 @@ import NodeClassSend from "./node/nodeSend/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
 
-
-const dialogVisible = ref(false)
-const handleClose = (done: () => void) => {
-  ElMessageBox.confirm('Are you sure to close this dialog?')
-    .then(() => {
-      done()
-    })
-    .catch(() => {
-      // catch error
-    })
-}
+// const dialogVisible = ref(false)
+// const handleClose = (done: () => void) => {
+//   ElMessageBox.confirm('Are you sure to close this dialog?')
+//     .then(() => {
+//       done()
+//     })
+//     .catch(() => {
+//       // catch error
+//     })
+// }
 
 const appCan = ref(null);
+const nArr = reactive([]);
+const reLink = (id: any, arr: any) => {
+  // 需要删除的节点 上下文节点
+  let source = ref(null);
+  let target = ref(null);
+  arr.forEach((e: any) => {
+    if(e.source == id){
+      source.value = e.source
+      target.value = e.target
+    }
+  });
+  arr.forEach((e: any) => {
+    if(e.source != id && e.target == id){
+      e.target = target.value
+      nArr.push(e as never)
+    }
+    if(e.source != id){
+      nArr.push(e as never)
+    }
+  })
+  return [...new Set(nArr)] 
+};
+
 onMounted(() => {
   let dom = document.getElementById("container");
   let nodes = [
@@ -51,7 +73,7 @@ onMounted(() => {
       label: "发起人",
       x: 0,
       y: 300,
-      type:'init',
+      type: "init",
       Class: NodeClassInit,
     },
     {
@@ -70,12 +92,13 @@ onMounted(() => {
       y: 300,
       Class: NodeClassSend,
     },
-    ,{
-      id:'4',
+    ,
+    {
+      id: "4",
       x: 500,
       y: 415,
-      type:'end',
-      Class: NodeClassEnd
+      type: "end",
+      Class: NodeClassEnd,
     },
   ];
   let edges = [
@@ -104,22 +127,24 @@ onMounted(() => {
     moveable: true, //可平移(可传)
     draggable: true, //节点可拖动(可传)
   });
-  canvas.draw(
-    {
-      nodes: nodes, //节点信息
-      edges: edges,
-    }
-  );
+  canvas.draw({
+    nodes: nodes, //节点信息
+    edges: edges,
+  });
   canvas.on("system.node.click", (data: any) => {
     console.log(data);
+    // dialogVisible.value = true
   });
-  
   canvas.on("getAdd", (data: any) => {
-    console.log(data)
-    dialogVisible.value = true
+    console.log(data);
+    // dialogVisible.value = true
   });
   canvas.on("getDel", (data: any) => {
-    console.log(data)
+    canvas.removeNode(data.delId);
+    reLink(data.delId, edges);
+    canvas.draw({
+      edges: edges,
+    });
   });
 });
 </script>

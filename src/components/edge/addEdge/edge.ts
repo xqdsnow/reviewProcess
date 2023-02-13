@@ -11,6 +11,7 @@ class addEdge extends Edge {
    * 线段挂载后的回调
    */
   mounted() {
+    // Edge.setZIndex (0)
   }
   /**
    * 线段是否能连接的方法
