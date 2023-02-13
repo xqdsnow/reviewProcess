@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["element-plus/global"],
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
@@ -12,7 +13,7 @@
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "noEmit": true
-  },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/components/node.js", "src/components/mockData.js"],
+  }, 
+  "include": ["vue.d.ts","src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/components/node.js", "src/components/mockData.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

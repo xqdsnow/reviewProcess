@@ -1,0 +1,43 @@
+//node.scss
+.def {
+  position: absolute;
+  width: 240px;
+  height: 80px;
+  text-align: center;
+  color: white;
+  border-radius: 5%;
+  font-size: 14;
+  cursor: pointer;
+  .del-node {
+    width: 30px;
+    height: 30px;
+    position: relative;
+    top: -80px;
+    right: -210px;
+  }
+  .def-head {
+    height: 60px;
+    border-radius: 2%;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .def-head-left {
+      width: auto;
+      min-width: 100px;
+      height: 50px;
+      color: #333333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .def-head-right {
+      color: #979797;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
