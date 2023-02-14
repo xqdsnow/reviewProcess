@@ -17,14 +17,17 @@ class addEdge extends Edge {
    * 线段是否能连接的方法
    * @return {boolean} - 返回该线段是否能连接。若返回true，则会生成线段；若返回false，则会把线段销毁。
    */
-  //   isConnect() {}
+    // isConnect() {
+
+    // }
 
   /**
    * 线段的渲染方法
    * @param {obj} data - 线段基本信息
    * @return {dom} - 返回渲染svg dom的根节点
    */
-  //   draw(obj) {}
+    // draw(obj:any) {
+    // }
 
   /**
    * 箭头的渲染方法

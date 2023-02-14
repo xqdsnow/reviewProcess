@@ -29,7 +29,7 @@ class BaseNode extends Node {
       .css("top", this.top + "px")
       .css("left", this.left + "px")
       .attr("id", (this.id = opts.id));
-    let del = $(`<div class="del-node"></div>`);
+    // let del = $(`<div class="del-node"></div>`);
     let header = $(`<div class='init-node-head def-head'></div>`);
     let header_left = $(
       `<div class='init-node-head-left def-head-left'></div>`
@@ -39,21 +39,15 @@ class BaseNode extends Node {
     );
     container.text("发起人");
     container.text(opts.options.label);
-    del.text("X");
+    // del.text("X");
 
     container.append(header);
-    container.append(del);
+    // container.append(del);
     header.append(header_left);
     header.append(header_right);
 
     header_left.text("所有人");
     header_right.text(">");
-
-    // del.on("click", (e) => {
-    //   this.emit("getDel", {
-    //     nodedel:this
-    //   });
-    // });
 
     return container[0];
   };
