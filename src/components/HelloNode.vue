@@ -5,7 +5,7 @@
 import { ref, onMounted, reactive } from "vue";
 import { ElMessageBox } from "element-plus";
 
-import { Canvas, Node,Edge } from "butterfly-dag";
+import { Canvas, Node, Edge } from "butterfly-dag";
 import "butterfly-dag/dist/index.css";
 
 import NodeClassInit from "./node/nodeInit/node";
@@ -13,14 +13,14 @@ import NodeClassReview from "./node/nodeReview/node";
 import NodeClassSend from "./node/nodeSend/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
-const edgesFalg = ref(0);
+const inputId = ref();
 let nodes = reactive({
   arr: [
     {
       id: "1",
       label: "发起人",
       x: 0,
-      y: 300,
+      y: 500,
       type: "init",
       Class: NodeClassInit,
     },
@@ -29,7 +29,7 @@ let nodes = reactive({
       label: "审核人",
       type: "review",
       x: 150,
-      y: 300,
+      y: 500,
       Class: NodeClassReview,
     },
     {
@@ -37,13 +37,13 @@ let nodes = reactive({
       label: "抄送人",
       type: "send",
       x: 300,
-      y: 300,
+      y: 500,
       Class: NodeClassSend,
     },
     {
       id: "4",
-      x: 500,
-      y: 415,
+      x: 450,
+      y: 500,
       type: "end",
       Class: NodeClassEnd,
     },
@@ -74,29 +74,39 @@ let edges = reactive({
 
 const appCan = ref(null);
 const nArr = reactive([]);
+const reOrder = (val: any) => {
+  console.log(nodes.arr);
+  let top = 0;
+  let left = 500;
+  let data = val == null ? nodes.arr : val;
+  data.forEach((e: any) => {
+    e.x = top;
+    e.y = left;
+    top = Number(top) + 150;
+  });
+};
 const reLink = (type: any, id: any, val: any) => {
   if (type == "del") {
     let arr = val.arr;
     // 需要删除的节点 上下文节点
     let source = ref(null);
     let target = ref(null);
-    arr.forEach((e: any) => {
+    arr.forEach((e: any, index: number) => {
       if (e.source == id) {
+        arr.splice(index, 1)
         source.value = e.source;
         target.value = e.target;
       }
     });
     arr.forEach((e: any) => {
-      if (e.source != id && e.target == id) {
+      if (e.target == id) {
         e.target = target.value;
-        nArr.push(e as never);
-      }
-      if (e.source != id) {
-        nArr.push(e as never);
       }
     });
     // edges 重新赋值
-    edges.arr = [...new Set(nArr)];
+    edges.arr = arr;
+    console.log(nodes.arr);
+    reOrder(null);
     return edges.arr;
   }
 };
@@ -108,13 +118,15 @@ const reNode = (type: any, id: any, val: any) => {
         nNode.push(e as never);
       }
     });
+    reOrder(nNode);
     nodes.arr = nNode;
   }
 };
 
-let curId = ref(null);
+let curId = ref(10);
 const getId = () => {
   curId.value = new Date().getTime().toString() as never;
+  // ++curId.value;
   return curId.value;
 };
 const addEdge = (arr: any, val: any) => {
@@ -144,15 +156,22 @@ const addEdge = (arr: any, val: any) => {
   return edges.arr;
 };
 const addNode = (arr: any) => {
+  let indexId = arr.node.targetNode.id;
+  for (let i = 0; i < nodes.arr.length; i++) {
+    if (indexId == nodes.arr[i].id) {
+      inputId.value = i;
+    }
+  }
   let obj = {
     id: getId(),
-    label: "add",
+    label: `add_${curId.value}`,
     x: 0,
     y: 0,
     Class: NodeClassSend,
   };
-  nodes.arr.push(obj as never);
-  return obj;
+
+  nodes.arr.splice(inputId.value, 0, obj as never);
+  return nodes.arr;
 };
 onMounted(() => {
   let dom = document.getElementById("container");
@@ -170,8 +189,8 @@ onMounted(() => {
     console.log(data);
   });
   canvas.on("getAdd", (data: any) => {
-    console.log(data);
     canvas.addNode(addNode(data));
+    reOrder(null);
     canvas.redraw({
       nodes: nodes.arr,
       edges: addEdge(data, edges),
@@ -179,8 +198,10 @@ onMounted(() => {
   });
   canvas.on("getDel", (data: any) => {
     canvas.removeNode(data.delId);
+    // console.log( )
     reNode("single", data.delId, nodes.arr);
-    canvas.draw({
+    canvas.redraw({
+      nodes: nodes.arr,
       edges: reLink("del", data.delId, edges),
     });
   });

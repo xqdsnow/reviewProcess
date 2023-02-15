@@ -1,9 +1,12 @@
 //node.scss
 .end-node {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 240px;
+  height: 80px;
   .end-node-head {
+    position: relative;
+    top: 40px;
+    left: 115px;
     width: 10px;
     height: 10px;
     border-radius: 50%;
@@ -12,8 +15,9 @@
   .end-node-bottom {
     position: relative;
     width: 70px;
+    top: 40px;
+    left: 90px;
     color: #666666;
     font-size: 14px;
-    left: -25px;
   }
 }

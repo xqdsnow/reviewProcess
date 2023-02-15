@@ -22,7 +22,11 @@ class BaseNode extends Node {
           ) => string | number | boolean);
     };
   }) => {
-    let container = $(`<div class="end-node"><div class='end-node-head'></div><div class='end-node-bottom'>流程结束</div></div>`)
+    let container = $(`
+    <div class="end-node">
+      <div class='end-node-head'></div>
+      <div class='end-node-bottom'>流程结束</div>
+    </div>`)
       .css("top", this.top + "px")
       .css("left", this.left + "px")
       .attr("id", (this.id = opts.id));
