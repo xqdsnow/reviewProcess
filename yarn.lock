@@ -202,6 +202,11 @@
   resolved "https://mirrors.huaweicloud.com/repository/npm/@types/web-bluetooth/-/web-bluetooth-0.0.16.tgz#1d12873a8e49567371f2a75fe3e7f7edca6662d8"
   integrity sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==
 
+"@uiw/icons@^2.6.7":
+  version "2.6.7"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@uiw/icons/-/icons-2.6.7.tgz#e8f71b99eace967be493c33699b5d9302cea67f2"
+  integrity sha512-zL5CicCoz7XOthBrMfifno0i3dcFQ21CGeYPldri0Kbf0ocKeJz9uFPkjQvhSqjdoWxxYO4nvl+uZ8KVJtxSEQ==
+
 "@vitejs/plugin-vue@^4.0.0":
   version "4.0.0"
   resolved "https://mirrors.huaweicloud.com/repository/npm/@vitejs/plugin-vue/-/plugin-vue-4.0.0.tgz"

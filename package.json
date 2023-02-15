@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@uiw/icons": "^2.6.7",
     "butterfly-dag": "^4.3.18",
     "butterfly-vue": "^1.0.22",
     "element-plus": "^2.2.30",

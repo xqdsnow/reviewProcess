@@ -12,21 +12,33 @@
     font-size: 20px;
   }
 }
+.butterfly-custom-tips {
+  //   background-color: red;
+  //   padding: 0;
+}
 .handelDom {
-//   .handelCon {
-    .review {
-    }
-    .send {
-    }
-    .judge {
-    }
-    .review ,
-    .send ,
-    .judge {
-        font-size: 20px;
-        cursor: pointer;
-        margin: 5px 0;
-        border-bottom: 1px solid #eeeeee;
-    }
-//   }
+  .review {
+    color: #eebe77;
+  }
+  .send {
+    color: #79bbff;
+  }
+  .judge {
+    color: #95d475;
+  }
+  .review,
+  .send,
+  .judge {
+    font-size: 16px;
+    cursor: pointer;
+    margin: 5px 0;
+    border-bottom: 1px solid #73767a;
+  }
+}
+
+.w-icon-user,
+.w-icon-link,
+.w-icon-asterisk {
+  font-size: 16px;
+  padding: 4px 5px;
 }

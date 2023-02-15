@@ -1,5 +1,6 @@
 import { Edge, Tips } from "butterfly-dag";
 import "./edge.scss";
+import '@uiw/icons/fonts/w-icon.css';
 
 class addEdge extends Edge {
   constructor(opts: { id: any; x: any; y: any }) {
@@ -43,7 +44,11 @@ class addEdge extends Edge {
    */
   drawLabel() {
     let addDom = $(
-      `<div class="add-node"><div class='dom-icon'>+<div></div>`
+      `<div class="add-node">
+        <div class='dom-icon'>
+        +
+        <div>
+      </div>`
     ).css("cursor", "pointer");
     // let icon = addDom.children(".dom-icon");
     // icon.on("click", (e: any) => {
@@ -53,12 +58,12 @@ class addEdge extends Edge {
     // });
     let handelDom = $(`
     <div class="handelDom">
-        <div class="review">审核人</div>
-        <div class="send">抄送人</div>
-        <div class="judge">条件分支</div>
+        <div class="review"><i class="w-icon-user"></i> 审 核 人</div>
+        <div class="send"><i class="w-icon-link"></i> 抄 送 人</div>
+        <div class="judge"><i class="w-icon-asterisk"></i> 条件分支</div>
     </div>`);
     //给文本添加气泡
-    Tips.createTip({ 
+    Tips.createTip({
       className: `butterfly-custom-tips`,
       targetDom: addDom[0],
       genTipDom: () => {
@@ -66,28 +71,32 @@ class addEdge extends Edge {
       },
       placement: "right",
     });
-    let reviewHandel = $(handelDom.children('')[0]);
-    let sendHandel = $(handelDom.children('')[1]);
-    let judgeHandel = $(handelDom.children('')[2]);
+    let reviewHandel = $(handelDom.children("")[0]);
+    let sendHandel = $(handelDom.children("")[1]);
+    let judgeHandel = $(handelDom.children("")[2]);
+    let that = this
+    let objApi = function(val:any){
+      return {
+        node: that,
+        type:val
+      }
+    }
     reviewHandel.on("click", (e: any) => {
-      this.emit("getAdd", {
-        node: this,
-        type:'review'
-      });
+      $(handelDom[0]).hide();
+      this.emit("getAdd",objApi('review'))
     });
     sendHandel.on("click", (e: any) => {
-      this.emit("getAdd", {
-        node: this,
-        type:'send'
-      });
+      $(handelDom[0]).hide();
+      this.emit("getAdd",objApi('send'))
     });
     judgeHandel.on("click", (e: any) => {
-      this.emit("getAdd", {
-        node: this,
-        type:'judge'
-      });
+      $(handelDom[0]).hide();
+      this.emit("getAdd",objApi('judge'))
     });
-
+    // this.emit("getAdd", {
+    //   node: this,
+    //   type: "send",
+    // });
     return addDom[0];
   }
 

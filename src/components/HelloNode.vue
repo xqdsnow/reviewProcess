@@ -4,6 +4,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
 import { ElMessageBox } from "element-plus";
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import { Canvas, Node, Edge } from "butterfly-dag";
 import "butterfly-dag/dist/index.css";
@@ -167,7 +168,7 @@ const addNode = (arr: any) => {
   if (arr.type == "review") {
     let obj = {
       id: getId(),
-      label: `add_${curId.value}`,
+      label: `审核人_${curId.value}`,
       x: 0,
       y: 0,
       Class: NodeClassReview,
@@ -178,7 +179,7 @@ const addNode = (arr: any) => {
   if(arr.type == 'send'){
     let obj = {
       id: getId(),
-      label: `add_${curId.value}`,
+      label: `抄送人_${curId.value}`,
       x: 0,
       y: 0,
       Class: NodeClassSend,

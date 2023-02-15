@@ -1,7 +1,7 @@
 import { Node } from "butterfly-dag";
 import "./node.scss";
 import "./../sty/style.scss";
-
+import '@uiw/icons/fonts/w-icon.css';
 class BaseNode extends Node {
   constructor(opts: { id: any; x: any; y: any }) {
     super(opts);

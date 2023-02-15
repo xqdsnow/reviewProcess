@@ -2,6 +2,7 @@ import { Node } from "butterfly-dag";
 import "./node.scss";
 import "./../sty/style.scss";
 import { event } from "jquery";
+import '@uiw/icons/fonts/w-icon.css';
 
 class BaseNode extends Node {
   constructor(opts: { id: any; x: any; y: any }) {
@@ -32,7 +33,7 @@ class BaseNode extends Node {
           ) => string | number | boolean);
     };
   }) => {
-    let container = $(`<div class="review-node def"></div>`)
+    let container = $(`<div class="review-node def"><i class="w-icon-user"></i>${opts.options.label}</div>`)
       .css("top", this.top + "px")
       .css("left", this.left + "px")
       .attr("id", (this.id = opts.id));
@@ -44,8 +45,6 @@ class BaseNode extends Node {
     let header_right = $(
       `<div class='review-node-head-right def-head-right'></div>`
     );
-    container.text("发起人");
-    container.text(opts.options.label);
     container.append(header);
     del.text("X");
 
