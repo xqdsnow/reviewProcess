@@ -21,26 +21,39 @@
 .def {
   position: absolute;
   width: 240px;
-  height: 80px;
+  height: 100px;
   text-align: center;
   color: white;
   border-radius: 5%;
   font-size: 14;
   cursor: pointer;
+  .node-title {
+    font-size: 16px;
+    position: relative;
+    top: 4px;
+    right: 0px;
+    .w-icon-user,
+    .w-icon-link,
+    .w-icon-asterisk {
+      position: relative;
+      top: 3px;
+    }
+  }
   .del-node {
     width: 30px;
     height: 30px;
     position: relative;
-    top: -80px;
+    top: -94px;
     right: -210px;
   }
   .def-head {
-    height: 60px;
+    height: 70px;
     border-radius: 2%;
     background-color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 8px;
     .def-head-left {
       width: auto;
       min-width: 100px;

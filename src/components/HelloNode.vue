@@ -1,12 +1,18 @@
 <template>
   <div ref="appCan" id="container" class="container"></div>
+  <el-dialog v-model="dialogVisible" :title="title" width="30%">
+    <span>This is a message</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="confirm">确认</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
-import { ElMessageBox } from "element-plus";
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
-import { Canvas, Node, Edge } from "butterfly-dag";
+import { Canvas } from "butterfly-dag";
 import "butterfly-dag/dist/index.css";
 
 import NodeClassInit from "./node/nodeInit/node";
@@ -14,6 +20,21 @@ import NodeClassReview from "./node/nodeReview/node";
 import NodeClassSend from "./node/nodeSend/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
+
+const dialogVisible = ref(false);
+const nodeInfo = reactive({ arr: [] });
+const title = ref();
+const setInfo = () => {
+  title.value = `${nodeInfo.arr?.options.label}-节点数据设置`;
+};
+const handleCancel = () => {
+  dialogVisible.value = false;
+};
+const confirm = () => {
+  console.log(nodeInfo.arr);
+  // handleCancel();
+};
+
 const inputId = ref();
 let nodes = reactive({
   arr: [
@@ -29,7 +50,7 @@ let nodes = reactive({
       id: "2",
       label: "审核人",
       type: "review",
-      x: 150,
+      x: 200,
       y: 500,
       Class: NodeClassReview,
     },
@@ -37,13 +58,13 @@ let nodes = reactive({
       id: "3",
       label: "抄送人",
       type: "send",
-      x: 300,
+      x: 400,
       y: 500,
       Class: NodeClassSend,
     },
     {
       id: "4",
-      x: 450,
+      x: 600,
       y: 500,
       type: "end",
       Class: NodeClassEnd,
@@ -74,7 +95,6 @@ let edges = reactive({
 });
 
 const appCan = ref(null);
-const nArr = reactive([]);
 const reOrder = (val: any) => {
   let top = 0;
   let left = 500;
@@ -82,7 +102,7 @@ const reOrder = (val: any) => {
   data.forEach((e: any) => {
     e.x = top;
     e.y = left;
-    top = Number(top) + 150;
+    top = Number(top) + 200;
   });
 };
 const reLink = (type: any, id: any, val: any) => {
@@ -105,7 +125,6 @@ const reLink = (type: any, id: any, val: any) => {
     });
     // edges 重新赋值
     edges.arr = arr;
-    console.log(nodes.arr);
     reOrder(null);
     return edges.arr;
   }
@@ -126,7 +145,6 @@ const reNode = (type: any, id: any, val: any) => {
 let curId = ref(10);
 const getId = () => {
   curId.value = new Date().getTime().toString() as never;
-  // ++curId.value;
   return curId.value;
 };
 const addEdge = (arr: any, val: any) => {
@@ -156,10 +174,7 @@ const addEdge = (arr: any, val: any) => {
   return edges.arr;
 };
 const addNode = (arr: any) => {
-  console.log(arr);
-
   let indexId = arr.node.targetNode.id;
-
   for (let i = 0; i < nodes.arr.length; i++) {
     if (indexId == nodes.arr[i].id) {
       inputId.value = i;
@@ -176,7 +191,7 @@ const addNode = (arr: any) => {
     nodes.arr.splice(inputId.value, 0, obj as never);
     return nodes.arr;
   }
-  if(arr.type == 'send'){
+  if (arr.type == "send") {
     let obj = {
       id: getId(),
       label: `抄送人_${curId.value}`,
@@ -202,7 +217,10 @@ onMounted(() => {
     edges: edges.arr,
   });
   canvas.on("system.node.click", (data: any) => {
-    console.log(data);
+    // console.log(data);
+    nodeInfo.arr = data.node;
+    dialogVisible.value = true;
+    setInfo();
   });
   canvas.on("getAdd", (data: any) => {
     canvas.addNode(addNode(data));

@@ -25,11 +25,10 @@ class BaseNode extends Node {
           ) => string | number | boolean);
     };
   }) => {
-    let container = $(`<div class="init-node def"></div>`)
+    let container = $(`<div class="init-node def"><div class='node-title'>${opts.options.label}</div></div>`)
       .css("top", this.top + "px")
       .css("left", this.left + "px")
       .attr("id", (this.id = opts.id));
-    // let del = $(`<div class="del-node"></div>`);
     let header = $(`<div class='init-node-head def-head'></div>`);
     let header_left = $(
       `<div class='init-node-head-left def-head-left'></div>`
@@ -37,12 +36,8 @@ class BaseNode extends Node {
     let header_right = $(
       `<div class='init-node-head-right def-head-right'></div>`
     );
-    container.text("发起人");
-    container.text(opts.options.label);
-    // del.text("X");
 
     container.append(header);
-    // container.append(del);
     header.append(header_left);
     header.append(header_right);
 

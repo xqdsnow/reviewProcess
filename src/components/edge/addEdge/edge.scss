@@ -12,19 +12,18 @@
     font-size: 20px;
   }
 }
-.butterfly-custom-tips {
-  //   background-color: red;
-  //   padding: 0;
-}
 .handelDom {
   .review {
     color: #eebe77;
+    background-color: #292218;
   }
   .send {
     color: #79bbff;
+    background-color: #18222c;
   }
   .judge {
     color: #95d475;
+    background-color: #1c2518;
   }
   .review,
   .send,
@@ -32,7 +31,8 @@
     font-size: 16px;
     cursor: pointer;
     margin: 5px 0;
-    border-bottom: 1px solid #73767a;
+    padding: 2px;
+    border-radius: 2px;
   }
 }
 
