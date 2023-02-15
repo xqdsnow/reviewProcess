@@ -75,7 +75,6 @@ let edges = reactive({
 const appCan = ref(null);
 const nArr = reactive([]);
 const reOrder = (val: any) => {
-  console.log(nodes.arr);
   let top = 0;
   let left = 500;
   let data = val == null ? nodes.arr : val;
@@ -93,7 +92,7 @@ const reLink = (type: any, id: any, val: any) => {
     let target = ref(null);
     arr.forEach((e: any, index: number) => {
       if (e.source == id) {
-        arr.splice(index, 1)
+        arr.splice(index, 1);
         source.value = e.source;
         target.value = e.target;
       }
@@ -156,23 +155,39 @@ const addEdge = (arr: any, val: any) => {
   return edges.arr;
 };
 const addNode = (arr: any) => {
+  console.log(arr);
+
   let indexId = arr.node.targetNode.id;
+
   for (let i = 0; i < nodes.arr.length; i++) {
     if (indexId == nodes.arr[i].id) {
       inputId.value = i;
     }
   }
-  let obj = {
-    id: getId(),
-    label: `add_${curId.value}`,
-    x: 0,
-    y: 0,
-    Class: NodeClassSend,
-  };
-
-  nodes.arr.splice(inputId.value, 0, obj as never);
-  return nodes.arr;
+  if (arr.type == "review") {
+    let obj = {
+      id: getId(),
+      label: `add_${curId.value}`,
+      x: 0,
+      y: 0,
+      Class: NodeClassReview,
+    };
+    nodes.arr.splice(inputId.value, 0, obj as never);
+    return nodes.arr;
+  }
+  if(arr.type == 'send'){
+    let obj = {
+      id: getId(),
+      label: `add_${curId.value}`,
+      x: 0,
+      y: 0,
+      Class: NodeClassSend,
+    };
+    nodes.arr.splice(inputId.value, 0, obj as never);
+    return nodes.arr;
+  }
 };
+
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
@@ -198,7 +213,6 @@ onMounted(() => {
   });
   canvas.on("getDel", (data: any) => {
     canvas.removeNode(data.delId);
-    // console.log( )
     reNode("single", data.delId, nodes.arr);
     canvas.redraw({
       nodes: nodes.arr,

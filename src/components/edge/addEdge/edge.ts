@@ -1,4 +1,4 @@
-import { Edge } from "butterfly-dag";
+import { Edge, Tips } from "butterfly-dag";
 import "./edge.scss";
 
 class addEdge extends Edge {
@@ -17,17 +17,17 @@ class addEdge extends Edge {
    * 线段是否能连接的方法
    * @return {boolean} - 返回该线段是否能连接。若返回true，则会生成线段；若返回false，则会把线段销毁。
    */
-    // isConnect() {
+  // isConnect() {
 
-    // }
+  // }
 
   /**
    * 线段的渲染方法
    * @param {obj} data - 线段基本信息
    * @return {dom} - 返回渲染svg dom的根节点
    */
-    // draw(obj:any) {
-    // }
+  // draw(obj:any) {
+  // }
 
   /**
    * 箭头的渲染方法
@@ -42,15 +42,53 @@ class addEdge extends Edge {
    * @return {dom} - 返回注释渲染dom的根节点
    */
   drawLabel() {
-    this.addDom = $(`<div class="add-node"><div class='dom-icon'>+<div></div>`)
-    .css('cursor','pointer');
-    let icon = this.addDom.children(".dom-icon");
-    icon.on("click", (e) => {
+    let addDom = $(
+      `<div class="add-node"><div class='dom-icon'>+<div></div>`
+    ).css("cursor", "pointer");
+    // let icon = addDom.children(".dom-icon");
+    // icon.on("click", (e: any) => {
+    //   this.emit("getAdd", {
+    //     node: this,
+    //   });
+    // });
+    let handelDom = $(`
+    <div class="handelDom">
+        <div class="review">审核人</div>
+        <div class="send">抄送人</div>
+        <div class="judge">条件分支</div>
+    </div>`);
+    //给文本添加气泡
+    Tips.createTip({ 
+      className: `butterfly-custom-tips`,
+      targetDom: addDom[0],
+      genTipDom: () => {
+        return handelDom[0];
+      },
+      placement: "right",
+    });
+    let reviewHandel = $(handelDom.children('')[0]);
+    let sendHandel = $(handelDom.children('')[1]);
+    let judgeHandel = $(handelDom.children('')[2]);
+    reviewHandel.on("click", (e: any) => {
       this.emit("getAdd", {
-        node:this
+        node: this,
+        type:'review'
       });
     });
-    return this.addDom[0];
+    sendHandel.on("click", (e: any) => {
+      this.emit("getAdd", {
+        node: this,
+        type:'send'
+      });
+    });
+    judgeHandel.on("click", (e: any) => {
+      this.emit("getAdd", {
+        node: this,
+        type:'judge'
+      });
+    });
+
+    return addDom[0];
   }
 
   /**
