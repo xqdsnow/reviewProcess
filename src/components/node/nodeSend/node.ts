@@ -13,11 +13,7 @@ class BaseNode extends Node {
     this.options = opts;
   }
   mounted() {
-    $(this.dom).on("click", (e) => {
-      this.emit("system.node.click.one", {
-        node: this,
-      });
-    });
+
   }
   draw = (opts: {
     id: any;
@@ -58,6 +54,11 @@ class BaseNode extends Node {
       this.emit("getDel", {
         nodedel: this,
         delId: this.id,
+      });
+    });
+    container.on("dblclick", (e) => {
+      this.emit("dblclickNode", {
+        node: this,
       });
     });
     return container[0];

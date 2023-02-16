@@ -34,7 +34,9 @@ const confirm = () => {
   console.log(nodeInfo.arr);
   // handleCancel();
 };
+// 条件分支
 
+// 单节点
 const inputId = ref();
 let nodes = reactive({
   arr: [
@@ -71,6 +73,7 @@ let nodes = reactive({
     },
   ],
 });
+
 let edges = reactive({
   arr: [
     {
@@ -202,8 +205,11 @@ const addNode = (arr: any) => {
     nodes.arr.splice(inputId.value, 0, obj as never);
     return nodes.arr;
   }
+  if (arr.type == "judge") {
+  }
 };
-
+const nodesNum = ref(nodes.arr.length);
+const nNodeNum = ref();
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
@@ -216,12 +222,7 @@ onMounted(() => {
     nodes: nodes.arr, //节点信息
     edges: edges.arr,
   });
-  canvas.on("system.node.click", (data: any) => {
-    // console.log(data);
-    nodeInfo.arr = data.node;
-    dialogVisible.value = true;
-    setInfo();
-  });
+
   canvas.on("getAdd", (data: any) => {
     canvas.addNode(addNode(data));
     reOrder(null);
@@ -237,6 +238,11 @@ onMounted(() => {
       nodes: nodes.arr,
       edges: reLink("del", data.delId, edges),
     });
+  });
+  canvas.on("dblclickNode", (data: any) => {
+    nodeInfo.arr = data.node;
+    setInfo();
+    dialogVisible.value = true;
   });
 });
 </script>

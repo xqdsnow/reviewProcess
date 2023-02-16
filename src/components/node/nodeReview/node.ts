@@ -2,7 +2,7 @@ import { Node } from "butterfly-dag";
 import "./node.scss";
 import "./../sty/style.scss";
 import { event } from "jquery";
-import '@uiw/icons/fonts/w-icon.css';
+import "@uiw/icons/fonts/w-icon.css";
 
 class BaseNode extends Node {
   constructor(opts: { id: any; x: any; y: any }) {
@@ -12,13 +12,7 @@ class BaseNode extends Node {
     this.left = opts.y;
     this.options = opts;
   }
-  mounted() {
-    $(this.dom).on("click", (e) => {
-      this.emit("system.node.click.one", {
-        node: this,
-      });
-    });
-  }
+  mounted() {}
   draw = (opts: {
     id: any;
     options: {
@@ -33,11 +27,15 @@ class BaseNode extends Node {
           ) => string | number | boolean);
     };
   }) => {
-    let container = $(`<div class="review-node def"><div class='node-title'><i class="w-icon-user"></i>${opts.options.label}</div></div>`)
+    let container = $(
+      `<div class="review-node def"><div class='node-title'><i class="w-icon-user"></i>${opts.options.label}</div></div>`
+    )
       .css("top", this.top + "px")
       .css("left", this.left + "px")
       .attr("id", (this.id = opts.id));
-    let del = $(`<div class="del-node"><i class="w-icon-circle-close"></i></div>`);
+    let del = $(
+      `<div class="del-node"><i class="w-icon-circle-close"></i></div>`
+    );
     let header = $(`<div class='review-node-head def-head'></div>`);
     let header_left = $(
       `<div class='review-node-head-left def-head-left'></div>`
@@ -59,7 +57,11 @@ class BaseNode extends Node {
         delId: this.id,
       });
     });
-
+    container.on("dblclick", (e) => {
+      this.emit("dblclickNode", {
+        node: this,
+      });
+    });
     return container[0];
   };
 }

@@ -11,7 +11,3 @@ declare module '*.vue' {
   export default component
 }
 
-// declare module "*.vue" {
-//   import Vue from "vue";
-//   export default Vue;
-// }
