@@ -62,7 +62,6 @@ class addEdge extends Edge {
         <div class="send"><i class="w-icon-link"></i> 抄 送 人</div>
         <div class="judge"><i class="w-icon-asterisk"></i> 条件分支</div>
     </div>`);
-    //给文本添加气泡
     Tips.createTip({
       className: `butterfly-custom-tips`,
       targetDom: addDom[0],

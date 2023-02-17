@@ -1,0 +1,23 @@
+.judge-add-node-con {
+    position: relative;
+    width: 240px;
+    height: auto;
+  .judge-add-node {
+    background-color: white;
+    height: 30px;
+    width: 100px;
+    margin: 0 auto;
+    color: #3296fa;
+    border-radius:20px;
+    padding:3px 5px;
+    .node-title {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+  }
+}
+.handelDom-judge{
+  
+}

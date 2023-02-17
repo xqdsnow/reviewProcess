@@ -18,6 +18,8 @@ import "butterfly-dag/dist/index.css";
 import NodeClassInit from "./node/nodeInit/node";
 import NodeClassReview from "./node/nodeReview/node";
 import NodeClassSend from "./node/nodeSend/node";
+import NodeClassJudgeAdd from "./node/nodeJudgeAdd/node";
+import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
 
@@ -35,6 +37,7 @@ const confirm = () => {
   // handleCancel();
 };
 // 条件分支
+const judgePool = reactive({ arr: [] });
 
 // 单节点
 const inputId = ref();
@@ -52,7 +55,7 @@ let nodes = reactive({
       id: "2",
       label: "审核人",
       type: "review",
-      x: 200,
+      x: 180,
       y: 500,
       Class: NodeClassReview,
     },
@@ -60,13 +63,31 @@ let nodes = reactive({
       id: "3",
       label: "抄送人",
       type: "send",
-      x: 400,
+      x: 360,
       y: 500,
       Class: NodeClassSend,
     },
     {
+      id: "4_1",
+      label: "条件分支",
+      type: "judge",
+      x: 540,
+      y: 500,
+      Class: NodeClassJudgeAdd,
+    },
+    {
       id: "4",
-      x: 600,
+      label: "条件分支",
+      type: "judge",
+      priority: 1,
+      priorityTitle:'优先级一1',
+      x: 720,
+      y: 500,
+      Class: NodeClassJudge,
+    },
+    {
+      id: "9999",
+      x: 900,
       y: 500,
       type: "end",
       Class: NodeClassEnd,
@@ -91,7 +112,19 @@ let edges = reactive({
     {
       id: "e3",
       source: "3",
+      target: "4_1",
+      Class: EdgeClass,
+    },
+    {
+      id: "e4",
+      source: "4_1",
       target: "4",
+      Class: EdgeClass,
+    },
+    {
+      id: "e5",
+      source: "4",
+      target: "9999",
       Class: EdgeClass,
     },
   ],
@@ -105,7 +138,7 @@ const reOrder = (val: any) => {
   data.forEach((e: any) => {
     e.x = top;
     e.y = left;
-    top = Number(top) + 200;
+    top = Number(top) + 180;
   });
 };
 const reLink = (type: any, id: any, val: any) => {
@@ -206,10 +239,17 @@ const addNode = (arr: any) => {
     return nodes.arr;
   }
   if (arr.type == "judge") {
+    let obj = {
+      id: getId(),
+      label: `条件分支_${curId.value}`,
+      x: 0,
+      y: 0,
+      Class: NodeClassJudge,
+    };
+    nodes.arr.splice(inputId.value, 0, obj as never);
+    return nodes.arr;
   }
 };
-const nodesNum = ref(nodes.arr.length);
-const nNodeNum = ref();
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
