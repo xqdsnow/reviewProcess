@@ -40,7 +40,7 @@ class BaseNode extends Node {
       `<div class='judge-node-head-left def-head-left'></div>`
     );
     let header_right = $(
-      `<div class='judge-node-head-right def-head-right'></div>`
+      `<div class='judge-node-head-right def-head-right'>${opts.options.priorityTitle}</div>`
     );
     container.append(header);
 
@@ -49,9 +49,8 @@ class BaseNode extends Node {
     header.append(header_right);
 
     header_left.text("所有人");
-    header_right.text(">");
     del.on("click", (e) => {
-      this.emit("getDel", {
+      this.emit("getDelJudge", {
         nodedel: this,
         delId: this.id,
       });
@@ -59,6 +58,7 @@ class BaseNode extends Node {
     container.on("dblclick", (e) => {
       this.emit("dblclickNode", {
         node: this,
+        indexOf:this.id
       });
     });
     return container[0];

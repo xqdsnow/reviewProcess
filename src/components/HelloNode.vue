@@ -36,9 +36,6 @@ const confirm = () => {
   console.log(nodeInfo.arr);
   // handleCancel();
 };
-// 条件分支
-const judgePool = reactive({ arr: [] });
-
 // 单节点
 const inputId = ref();
 let nodes = reactive({
@@ -47,48 +44,14 @@ let nodes = reactive({
       id: "1",
       label: "发起人",
       x: 0,
-      y: 500,
+      y: 100,
       type: "init",
       Class: NodeClassInit,
     },
     {
-      id: "2",
-      label: "审核人",
-      type: "review",
-      x: 180,
-      y: 500,
-      Class: NodeClassReview,
-    },
-    {
-      id: "3",
-      label: "抄送人",
-      type: "send",
-      x: 360,
-      y: 500,
-      Class: NodeClassSend,
-    },
-    {
-      id: "4_1",
-      label: "条件分支",
-      type: "judge",
-      x: 540,
-      y: 500,
-      Class: NodeClassJudgeAdd,
-    },
-    {
-      id: "4",
-      label: "条件分支",
-      type: "judge",
-      priority: 1,
-      priorityTitle:'优先级一1',
-      x: 720,
-      y: 500,
-      Class: NodeClassJudge,
-    },
-    {
       id: "9999",
-      x: 900,
-      y: 500,
+      x: 300,
+      y: 100,
       type: "end",
       Class: NodeClassEnd,
     },
@@ -100,30 +63,6 @@ let edges = reactive({
     {
       id: "e1",
       source: "1",
-      target: "2",
-      Class: EdgeClass,
-    },
-    {
-      id: "e2",
-      source: "2",
-      target: "3",
-      Class: EdgeClass,
-    },
-    {
-      id: "e3",
-      source: "3",
-      target: "4_1",
-      Class: EdgeClass,
-    },
-    {
-      id: "e4",
-      source: "4_1",
-      target: "4",
-      Class: EdgeClass,
-    },
-    {
-      id: "e5",
-      source: "4",
       target: "9999",
       Class: EdgeClass,
     },
@@ -133,15 +72,33 @@ let edges = reactive({
 const appCan = ref(null);
 const reOrder = (val: any) => {
   let top = 0;
-  let left = 500;
+  let left = 100;
   let data = val == null ? nodes.arr : val;
+  let judgeSite = { x: "", y: "" };
   data.forEach((e: any) => {
-    e.x = top;
-    e.y = left;
-    top = Number(top) + 180;
+    if (e.type != "judge") {
+      e.x = top;
+      e.y = left;
+      top = Number(top) + 180;
+    }
+    if (e.priority == 1 && e.type == "judge") {
+      e.x = top;
+      e.y = left;
+      top = Number(top) + 180;
+      judgeSite = getJudgeOneSite(e);
+    }
+    if (
+      e.priority != 1 &&
+      e.type == "judge" &&
+      e.id == judgePool.arr[judgePool.arr.length - 1].opts[0]
+    ) {
+      e.x = judgeSite.x;
+      e.y = judgeSite.y + 300 * judgePool.arr.length;
+    }
   });
 };
 const reLink = (type: any, id: any, val: any) => {
+  // console.log(id);
   if (type == "del") {
     let arr = val.arr;
     // 需要删除的节点 上下文节点
@@ -183,7 +140,7 @@ const getId = () => {
   curId.value = new Date().getTime().toString() as never;
   return curId.value;
 };
-const addEdge = (arr: any, val: any) => {
+const addEdge = (arr: any, val: any, type: any) => {
   let edges = val.arr;
   // 当前点击的连线
   let curEdge = arr.node.options;
@@ -206,9 +163,38 @@ const addEdge = (arr: any, val: any) => {
     Class: EdgeClass,
   };
   edges.push(obj as never);
+  edges = [...new Set(edges)];
+
+  if (type == "judge") {
+    let fname = arr.node.options.id; 
+    let sname = `e_${poolIndex.value}_${poolIndex.value}`;
+    let tname = `e_${curId.value}`;
+    console.log(fname, sname, tname);
+    let fTarget = ref();
+    let sTarget = ref()
+    let tTarget = ref()
+    edges.forEach((e:any)=>{
+      console.log(e)
+      if(e.id == fname) {
+        fTarget.value = e.target
+      }
+      if(e.id == sname) {
+        sTarget.value = e.target
+      }
+      if(e.id == fname) {
+        tTarget.value = e.target
+      }
+    })
+    console.log(fTarget.value,sTarget.value,tTarget.value)
+  }
   edges.arr = [...new Set(edges)];
   return edges.arr;
 };
+const priority = ref(2);
+const poolIndex = ref(0);
+// 条件分支
+const judgePool = reactive({ arr: [] });
+
 const addNode = (arr: any) => {
   let indexId = arr.node.targetNode.id;
   for (let i = 0; i < nodes.arr.length; i++) {
@@ -219,7 +205,7 @@ const addNode = (arr: any) => {
   if (arr.type == "review") {
     let obj = {
       id: getId(),
-      label: `审核人_${curId.value}`,
+      label: `审核人_${curId.value.toString().slice(-4)}`,
       x: 0,
       y: 0,
       Class: NodeClassReview,
@@ -230,7 +216,7 @@ const addNode = (arr: any) => {
   if (arr.type == "send") {
     let obj = {
       id: getId(),
-      label: `抄送人_${curId.value}`,
+      label: `抄送人_${curId.value.toString().slice(-4)}`,
       x: 0,
       y: 0,
       Class: NodeClassSend,
@@ -239,17 +225,94 @@ const addNode = (arr: any) => {
     return nodes.arr;
   }
   if (arr.type == "judge") {
+    let pool = {
+      id: poolIndex.value,
+      opts: [],
+      linkId: "",
+    };
+    pool.linkId = `${poolIndex.value}_${poolIndex.value}`;
     let obj = {
-      id: getId(),
-      label: `条件分支_${curId.value}`,
+      id: getId() + 1,
+      label: `条件分支_${priority.value}`,
+      priority: priority.value,
+      priorityTitle: `优先级_${priority.value}`,
       x: 0,
       y: 0,
+      type: "judge",
       Class: NodeClassJudge,
     };
+    pool.opts.push((curId.value + 1) as never);
     nodes.arr.splice(inputId.value, 0, obj as never);
+    --priority.value;
+    let obj1 = {
+      id: getId(),
+      label: `条件分支_${priority.value}`,
+      priority: priority.value,
+      priorityTitle: `优先级_${priority.value}`,
+      x: 0,
+      y: 0,
+      type: "judge",
+      Class: NodeClassJudge,
+    };
+    pool.opts.push(curId.value as never);
+    nodes.arr.splice(inputId.value, 0, obj1 as never);
+    judgePool.arr.push(pool as never);
+    priority.value = 2;
     return nodes.arr;
   }
 };
+const addNodeJudge = (arr: any) => {
+  let index = ++poolIndex.value;
+  let linkId = `${index}_${index}`;
+  let indexId = arr.node.targetNode.id;
+  let valueId = ref(0);
+  for (let i = 0; i < nodes.arr.length; i++) {
+    if (indexId == nodes.arr[i].id) {
+      valueId.value = i;
+    }
+  }
+  let obj = {
+    Class: NodeClassJudgeAdd,
+    id: linkId,
+  };
+  nodes.arr.splice(valueId.value, 0, obj as never);
+  return nodes.arr;
+};
+const getJudgeOneSite = (val: any) => {
+  return {
+    x: val.x,
+    y: val.y,
+  };
+};
+const reLinkJudge = (val: any) => {
+  let linkName = `e_${poolIndex.value}_${poolIndex.value}`;
+  let linkInfo = val.node.options;
+  let linkId = linkInfo.id;
+  let linkS = ref();
+  let linkT = ref();
+  edges.arr.forEach((e: any) => {
+    if (e.id == linkId) {
+      linkS.value = e.source;
+      linkT.value = e.target;
+    }
+  });
+  edges.arr.forEach((e: any) => {
+    if (e.source == linkS.value) {
+      e.target = `${poolIndex.value}_${poolIndex.value}`;
+    }
+    if (e.target == linkT.value) {
+      e.source = linkId;
+    }
+  });
+  let obj = {
+    id: linkName,
+    source: `${poolIndex.value}_${poolIndex.value}`,
+    target: linkT.value,
+    Class: EdgeClass,
+  };
+  edges.arr.push(obj);
+};
+
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
@@ -262,13 +325,34 @@ onMounted(() => {
     nodes: nodes.arr, //节点信息
     edges: edges.arr,
   });
-
   canvas.on("getAdd", (data: any) => {
-    canvas.addNode(addNode(data));
-    reOrder(null);
+    if (data.type == "judge") {
+      canvas.addNode(addNodeJudge(data));
+      reOrder(null);
+      canvas.addNode(addNode(data));
+      reOrder(null);
+      reLinkJudge(data);
+      canvas.redraw({
+        nodes: nodes.arr,
+        edges: addEdge(data, edges, data.type),
+      });
+    } else {
+      canvas.addNode(addNode(data));
+      reOrder(null);
+      canvas.redraw({
+        nodes: nodes.arr,
+        edges: addEdge(data, edges),
+      });
+    }
+  });
+  canvas.on("getDelJudge", (data: any) => {
+    // console.log(data)
+    // canvas.removeNode(data.delId);
+    canvas.removeNode(data.delId);
+    reNode("single", data.delId, nodes.arr);
     canvas.redraw({
       nodes: nodes.arr,
-      edges: addEdge(data, edges),
+      edges: reLink("del", data.delId, edges),
     });
   });
   canvas.on("getDel", (data: any) => {
