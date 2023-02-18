@@ -166,26 +166,59 @@ const addEdge = (arr: any, val: any, type: any) => {
   edges = [...new Set(edges)];
 
   if (type == "judge") {
-    let fname = arr.node.options.id; 
+    let fname = arr.node.options.id;
     let sname = `e_${poolIndex.value}_${poolIndex.value}`;
     let tname = `e_${curId.value}`;
-    console.log(fname, sname, tname);
     let fTarget = ref();
-    let sTarget = ref()
-    let tTarget = ref()
-    edges.forEach((e:any)=>{
-      console.log(e)
-      if(e.id == fname) {
-        fTarget.value = e.target
+    let sTarget = ref();
+    let tTarget = ref();
+    edges.forEach((e: any) => {
+      if (e.id == fname) {
+        fTarget.value = e.target;
       }
-      if(e.id == sname) {
-        sTarget.value = e.target
+      if (e.id == sname) {
+        sTarget.value = e.target;
       }
-      if(e.id == fname) {
-        tTarget.value = e.target
+      if (e.id == tname) {
+        tTarget.value = e.target;
       }
-    })
-    console.log(fTarget.value,sTarget.value,tTarget.value)
+    });
+    edges.forEach((e: any) => {
+      if (e.id == fname) {
+        e.target = tTarget.value;
+      }
+      if (e.id == sname) {
+        e.target = fTarget.value;
+      }
+      if (e.id == tname) {
+        e.target = sTarget.value;
+      }
+    });
+    // 旁支
+    let sNodeId = ref();
+    nodes.arr.forEach((e: any) => {
+      if (e.priority == 2) {
+        console.log(e);
+        sNodeId.value = e.id;
+      }
+    });
+    let obj1 = {
+      id: `e1_${sNodeId.value}`,
+      source: `${poolIndex.value}_${poolIndex.value}`,
+      target: sNodeId.value,
+    };
+    let obj2 = {
+      id: `e2_${sNodeId.value}`,
+      source: sNodeId.value,
+      target: 9999,
+      Class: EdgeClass,
+    };
+    edges.push(obj1 as never, obj2 as never);
+    edges.forEach((e: any) => {
+      if (e.id == `e_${poolIndex.value}_${poolIndex.value}`) {
+        delete e.Class; 
+      }
+    });
   }
   edges.arr = [...new Set(edges)];
   return edges.arr;
