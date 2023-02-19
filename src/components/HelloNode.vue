@@ -12,7 +12,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
-import { Canvas ,Edge} from "butterfly-dag";
+import { Canvas, Edge } from "butterfly-dag";
 import "butterfly-dag/dist/index.css";
 
 import NodeClassInit from "./node/nodeInit/node";
@@ -22,6 +22,7 @@ import NodeClassJudgeAdd from "./node/nodeJudgeAdd/node";
 import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
+import { ja } from "element-plus/es/locale";
 
 const dialogVisible = ref(false);
 const nodeInfo = reactive({ arr: [] });
@@ -140,103 +141,105 @@ const getId = () => {
   curId.value = new Date().getTime().toString() as never;
   return curId.value;
 };
+// 条件分支
+const judgePool = reactive({ arr: [] });
+const edgepool = reactive({});
 const addEdge = (arr: any, val: any, type: any) => {
-  console.log(nodes.arr);
-  // console.log(edges.arr);
-  console.log(judgePool.arr);
-  let edges = val.arr;
-  // 当前点击的连线
-  let curEdge = arr.node.options;
-  // 找到当前连线的  source targ  -> 新增的节点在这个中间
-  let curSource = curEdge.source;
-  let curTarget = curEdge.target;
-  // 修改旧的节点
-  edges.forEach((e: any) => {
-    if (e.target == curTarget) {
-      e.target = curId.value;
+  let pool = reactive({arr:[]});
+  let data = preNodePool.arr.flat();
+  for (let i = 0; i < data.length - 1; i++) {
+    console.log("++++");
+    console.log(data[i]);
+    if (data[i] != "9999") {
+      if (data[i].search("_") == -1) {
+        let obj = {
+          id: `e_${data[i]}`,
+          source: data[i],
+          target: data[i + 1],
+          Class: EdgeClass,
+        };
+        pool.arr.push(obj as never)
+        // console.log(obj);
+      } else {
+        let obj = {
+          id: `e_${data[i]}`,
+          source: data[i],
+          target: data[i + 1],
+        };
+        pool.arr.push(obj as never)
+      }
     }
-    if (e.source == curTarget) {
-      e.source = curTarget;
-    }
-  });
-  let obj = {
-    id: `e_${curId.value}`,
-    source: curId.value,
-    target: curTarget,
-    Class: EdgeClass,
-  };
-  edges.push(obj as never);
-  edges = [...new Set(edges)];
-
-  if (type == "judge") {
-    let fname = arr.node.options.id;
-    let sname = `e_${poolIndex.value}_${poolIndex.value}`;
-    let tname = `e_${curId.value}`;
-    let fTarget = ref();
-    let sTarget = ref();
-    let tTarget = ref();
-    edges.forEach((e: any) => {
-      if (e.id == `e_${poolIndex.value}_${poolIndex.value}`) {
-        delete e.Class;
-      }
-      if (e.id == fname) {
-        fTarget.value = e.target;
-      }
-      if (e.id == sname) {
-        sTarget.value = e.target;
-      }
-      if (e.id == tname) {
-        tTarget.value = e.target;
-      }
-    });
-    edges.forEach((e: any) => {
-      if (e.id == fname) {
-        e.target = tTarget.value;
-      }
-      if (e.id == sname) {
-        e.target = fTarget.value;
-      }
-      if (e.id == tname) {
-        e.target = sTarget.value;
-      }
-    });
-
-    // 旁支
-    let sNodeId = ref();
-    nodes.arr.forEach((e: any) => {
-      if (e.priority == 2) {
-        console.log(e);
-        sNodeId.value = e.id;
-      }
-    });
-    let obj1 = {
-      id: `e1_${sNodeId.value}`,
-      source: `${poolIndex.value}_${poolIndex.value}`,
-      target: sNodeId.value,
-    };
-    let obj2 = {
-      id: `e2_${sNodeId.value}`,
-      source: sNodeId.value,
-      target: 9999,
-      Class: EdgeClass,
-    };
-    edges.push(obj1 as never, obj2 as never);
-    edges.forEach((e: any) => {
-      if (e.id == `e_${poolIndex.value}_${poolIndex.value}`) {
-        delete e.Class;
-      }
-    });
   }
-  edges.arr = [...new Set(edges)];
-  console.log(edges.arr);
+  edges.arr = pool.arr;
   return edges.arr;
 };
 const priority = ref(2);
 const poolIndex = ref(0);
-// 条件分支
-const judgePool = reactive({ arr: [] });
 
+let preNodePool = reactive({ arr: [["1", "9999"]] });
 const addNode = (arr: any) => {
+  getId();
+  let nodeId = curId.value;
+  let preNodeId = arr.node.sourceNode.id;
+  let judgeMainId = `${poolIndex.value}_${poolIndex.value}`;
+  if (arr.type == "judge") {
+    // 生成条件分支
+    let jArr = ref([]);
+    jArr.value = [
+      judgeMainId as never,
+      (curId.value + 1) as never,
+      "9999" as never,
+    ];
+    preNodePool.arr.push(jArr.value as never);
+  }
+  preNodePool.arr.forEach((e: any, index: any) => {
+    e.forEach((e1: any, index1: any) => {
+      if (e1 == preNodeId) {
+        preNodePool.arr[index].splice(index1 + 1, 0, nodeId as never);
+        if (arr.type == "judge") {
+          preNodePool.arr[index].splice(index1 + 1, 0, judgeMainId as never);
+        }
+      }
+    });
+  });
+
+  console.log(preNodePool.arr);
+  // let obj = {};
+  // let preNodeId = arr.node.sourceNode.id;
+  // let judgeMainId = `${poolIndex.value}_${poolIndex.value}`;
+  // preNodePool.arr.forEach((e: any, index: any) => {
+  //   if (e == preNodeId) {
+  //     preNodePool.arr.splice(index + 1, 0, curId.value as never);
+  //     if (arr.type == "judge") {
+  //       preNodePool.arr.splice(index + 1, 0, judgeMainId as never);
+  //     }
+  //   }
+  // });
+  // preNodePoolF.arr.forEach((e: any, index: any) => {
+  //   if (e == preNodeId) {
+  //     preNodePoolF.arr.splice(index + 1, 0, (curId.value + 1) as never);
+  //     if (arr.type == "judge") {
+  //       preNodePoolF.arr.splice(index + 1, 0, judgeMainId as never);
+  //     }
+  //   }
+  // });
+  // if (arr.type == "judge") {
+  //   if (JSON.stringify(judgeNodePool.child) === "{}") {
+  //     obj = {
+  //       id: poolIndex.value,
+  //       linkId: `${poolIndex.value}_${poolIndex.value}`,
+  //       opts: [preNodePool, preNodePoolF],
+  //       child: {},
+  //     };
+  //     judgeNodePool.child = obj;
+  //   } else {
+  //     setPrePool(judgeNodePool.child);
+  //   }
+  // }
+  // console.log(preNodePool.arr);
+  // console.log(preNodePoolF.arr);
+  // // console.log(judgeNodePool.child);
+
   let indexId = arr.node.targetNode.id;
   for (let i = 0; i < nodes.arr.length; i++) {
     if (indexId == nodes.arr[i].id) {
@@ -245,7 +248,7 @@ const addNode = (arr: any) => {
   }
   if (arr.type == "review") {
     let obj = {
-      id: getId(),
+      id: curId.value,
       label: `审核人_${curId.value.toString().slice(-4)}`,
       x: 0,
       y: 0,
@@ -256,7 +259,7 @@ const addNode = (arr: any) => {
   }
   if (arr.type == "send") {
     let obj = {
-      id: getId(),
+      id: curId.value,
       label: `抄送人_${curId.value.toString().slice(-4)}`,
       x: 0,
       y: 0,
@@ -273,7 +276,7 @@ const addNode = (arr: any) => {
     };
     pool.linkId = `${poolIndex.value}_${poolIndex.value}`;
     let obj = {
-      id: getId() + 1,
+      id: curId.value + 1,
       label: `条件分支_${priority.value}`,
       priority: priority.value,
       priorityTitle: `优先级_${priority.value}`,
@@ -286,7 +289,7 @@ const addNode = (arr: any) => {
     nodes.arr.splice(inputId.value, 0, obj as never);
     --priority.value;
     let obj1 = {
-      id: getId(),
+      id: curId.value,
       label: `条件分支_${priority.value}`,
       priority: priority.value,
       priorityTitle: `优先级_${priority.value}`,
