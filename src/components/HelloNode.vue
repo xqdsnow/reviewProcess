@@ -12,7 +12,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
-import { Canvas } from "butterfly-dag";
+import { Canvas ,Edge} from "butterfly-dag";
 import "butterfly-dag/dist/index.css";
 
 import NodeClassInit from "./node/nodeInit/node";
@@ -141,6 +141,9 @@ const getId = () => {
   return curId.value;
 };
 const addEdge = (arr: any, val: any, type: any) => {
+  console.log(nodes.arr);
+  // console.log(edges.arr);
+  console.log(judgePool.arr);
   let edges = val.arr;
   // 当前点击的连线
   let curEdge = arr.node.options;
@@ -173,6 +176,9 @@ const addEdge = (arr: any, val: any, type: any) => {
     let sTarget = ref();
     let tTarget = ref();
     edges.forEach((e: any) => {
+      if (e.id == `e_${poolIndex.value}_${poolIndex.value}`) {
+        delete e.Class;
+      }
       if (e.id == fname) {
         fTarget.value = e.target;
       }
@@ -194,6 +200,7 @@ const addEdge = (arr: any, val: any, type: any) => {
         e.target = sTarget.value;
       }
     });
+
     // 旁支
     let sNodeId = ref();
     nodes.arr.forEach((e: any) => {
@@ -216,11 +223,12 @@ const addEdge = (arr: any, val: any, type: any) => {
     edges.push(obj1 as never, obj2 as never);
     edges.forEach((e: any) => {
       if (e.id == `e_${poolIndex.value}_${poolIndex.value}`) {
-        delete e.Class; 
+        delete e.Class;
       }
     });
   }
   edges.arr = [...new Set(edges)];
+  console.log(edges.arr);
   return edges.arr;
 };
 const priority = ref(2);
@@ -307,6 +315,7 @@ const addNodeJudge = (arr: any) => {
   let obj = {
     Class: NodeClassJudgeAdd,
     id: linkId,
+    type: "judgeMian",
   };
   nodes.arr.splice(valueId.value, 0, obj as never);
   return nodes.arr;
@@ -353,6 +362,16 @@ onMounted(() => {
     zoomable: true, //可缩放(可传)
     moveable: true, //可平移(可传)
     draggable: true, //节点可拖动(可传)
+    theme: {
+      //主题
+      edge: {
+        arrow: true,
+        shapeType: "AdvancedBezier", //Manhattan
+        hasRadius: true,
+        arrowPosition: 0.6,
+        arrowOffset: 20,
+      },
+    },
   });
   canvas.draw({
     nodes: nodes.arr, //节点信息
@@ -374,7 +393,7 @@ onMounted(() => {
       reOrder(null);
       canvas.redraw({
         nodes: nodes.arr,
-        edges: addEdge(data, edges),
+        edges: addEdge(data, edges, null),
       });
     }
   });

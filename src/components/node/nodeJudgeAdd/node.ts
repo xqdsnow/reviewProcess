@@ -14,6 +14,7 @@ class BaseNode extends Node {
   mounted() {}
   draw = (opts: {
     id: any;
+    type:any;
     options: {
       label:
         | string
@@ -31,7 +32,8 @@ class BaseNode extends Node {
     )
       .css("top", this.top + "px")
       .css("left", this.left + "px")
-      .attr("id", (this.id = opts.id));
+      .attr("id", (this.id = opts.id))
+      .attr("type",(this.type = opts.type))
 
     container.on("click", (e) => {
       this.emit("judgeAdd", {
