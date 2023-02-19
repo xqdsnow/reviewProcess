@@ -22,7 +22,7 @@ import NodeClassJudgeAdd from "./node/nodeJudgeAdd/node";
 import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
-import { ja } from "element-plus/es/locale";
+import { ja, pa } from "element-plus/es/locale";
 
 const dialogVisible = ref(false);
 const nodeInfo = reactive({ arr: [] });
@@ -45,14 +45,14 @@ let nodes = reactive({
       id: "1",
       label: "发起人",
       x: 0,
-      y: 100,
+      y: (document.body.clientWidth - 240) / 2,
       type: "init",
       Class: NodeClassInit,
     },
     {
       id: "9999",
       x: 300,
-      y: 100,
+      y: (document.body.clientWidth - 240) / 2,
       type: "end",
       Class: NodeClassEnd,
     },
@@ -70,31 +70,128 @@ let edges = reactive({
   ],
 });
 
+let preNodePool = reactive({ arr: [["1", "9999"]] });
 const appCan = ref(null);
-const reOrder = (val: any) => {
-  let top = 0;
-  let left = 100;
+const getSite = (val: any) => {
+  let num = reactive({
+    form: {
+      top: "",
+      left: "",
+    },
+  });
+  let id = val.id;
+  let jId = ref(0);
+  judgePool.arr.forEach((e: any) => {
+    if (e.opts.indexOf(id) != -1) {
+      jId.value = e.linkId;
+    }
+  });
+  nodes.arr.forEach((e: any) => {
+    if (e.id == jId.value) {
+      num.form.top = e.x;
+      num.form.left = e.y;
+    }
+  });
+  return num.form;
+};
+const getPreSite = (val: any) => {
+  if (val == 1) {
+    return {
+      top: 0,
+      left: (document.body.clientWidth - 240) / 2,
+    };
+  }
+  if (val == 9999) {
+    return {
+      top: 380,
+      left: (document.body.clientWidth - 240) / 2,
+    };
+  }
+  let num = reactive({
+    form: {
+      top: "",
+      left: "",
+    },
+  });
+  let curId = ref("");
+  edges.arr.forEach((e: any) => {
+    if (e.target == val) {
+      curId.value = e.source;
+    }
+  });
+  nodes.arr.forEach((e: any) => {
+    if (e.id == curId.value) {
+      num.form.top = e.x;
+      num.form.left = e.y;
+    }
+  });
+  return num.form;
+};
+const planSite = (val?: any) => {
   let data = val == null ? nodes.arr : val;
-  let judgeSite = { x: "", y: "" };
+  let i = ref(0);
+  let arr = reactive({ arr: [] });
   data.forEach((e: any) => {
-    if (e.type != "judge") {
-      e.x = top;
-      e.y = left;
-      top = Number(top) + 180;
+    if (e.type == "judge") {
+      ++i.value;
+      arr.arr.push(e as never);
     }
-    if (e.priority == 1 && e.type == "judge") {
-      e.x = top;
-      e.y = left;
-      top = Number(top) + 180;
-      judgeSite = getJudgeOneSite(e);
-    }
-    if (
-      e.priority != 1 &&
-      e.type == "judge" &&
-      e.id == judgePool.arr[judgePool.arr.length - 1].opts[0]
-    ) {
-      e.x = judgeSite.x;
-      e.y = judgeSite.y + 300 * judgePool.arr.length;
+  });
+  let lArr = reactive({ arr: [] });
+  let rArr = reactive({ arr: [] });
+  let aArr = reactive({ arr: [] });
+  // 求中位数
+  if (i.value % 2 != 0) {
+  } else {
+    // 没有中位数
+    let flag = i.value / 2;
+    lArr.arr = arr.arr.slice(0, flag);
+    rArr.arr = arr.arr.slice(flag, arr.arr.length);
+  }
+  aArr.arr.push(lArr as never, rArr as never);
+  return aArr.arr;
+};
+const reOrder = (val: any) => {
+  // 获取父节点的位置
+  // console.log(parent);
+  // console.log(nodes.arr);
+  // console.log(judgePool.arr)
+  let nodeW = "240";
+  let nodeH = "100";
+  let aNodeW = "30";
+  let aNodeH = "30";
+  let site = "30";
+  // 获取屏幕宽高
+  let screenH = document.body.clientHeight;
+  let screenW = document.body.clientWidth;
+
+  // 初始位置
+  let top = ref(0);
+  let aArr = planSite();
+  let lArr = reactive({ arr: [] });
+  let rArr = reactive({ arr: [] });
+  lArr.arr = aArr[0].arr;
+  rArr.arr = aArr[1].arr;
+  nodes.arr.forEach((e: any) => {
+    if (e.type == "judge") {
+      let obj = getSite(e);
+      e.x = obj.top;
+      e.y = obj.left;
+      lArr.arr.forEach((e1: any, index: any) => {
+        if (e1.id == e.id) {
+          e.y = Number(obj.left) - (index + 1) * Number(nodeW);
+        }
+      });
+      rArr.arr.forEach((e1: any, index: any) => {
+        if (e1.id == e.id) {
+          e.y = Number(obj.left) + (index + 1) * Number(nodeW);
+        }
+      });
+    } else {
+      e.x = top.value;
+      e.y = getPreSite(e.id).left;
+      top.value =
+        Number(top.value) + Number(nodeH) + Number(aNodeH) + Number(site);
     }
   });
 };
@@ -143,30 +240,22 @@ const getId = () => {
 };
 // 条件分支
 const judgePool = reactive({ arr: [] });
-const edgepool = reactive({});
-const addEdge = (arr: any, val: any, type: any) => {
-  let pool = reactive({arr:[]});
+const addEdge = () => {
+  let pool = reactive({ arr: [] });
   let data = preNodePool.arr.flat();
   for (let i = 0; i < data.length - 1; i++) {
-    console.log("++++");
-    console.log(data[i]);
+    let obj = {
+      id: `e_${data[i]}`,
+      source: data[i],
+      target: data[i + 1],
+      Class: EdgeClass,
+    };
     if (data[i] != "9999") {
       if (data[i].search("_") == -1) {
-        let obj = {
-          id: `e_${data[i]}`,
-          source: data[i],
-          target: data[i + 1],
-          Class: EdgeClass,
-        };
-        pool.arr.push(obj as never)
-        // console.log(obj);
+        pool.arr.push(obj as never);
       } else {
-        let obj = {
-          id: `e_${data[i]}`,
-          source: data[i],
-          target: data[i + 1],
-        };
-        pool.arr.push(obj as never)
+        obj.Class = undefined as never;
+        pool.arr.push(obj as never);
       }
     }
   }
@@ -176,7 +265,6 @@ const addEdge = (arr: any, val: any, type: any) => {
 const priority = ref(2);
 const poolIndex = ref(0);
 
-let preNodePool = reactive({ arr: [["1", "9999"]] });
 const addNode = (arr: any) => {
   getId();
   let nodeId = curId.value;
@@ -202,44 +290,6 @@ const addNode = (arr: any) => {
       }
     });
   });
-
-  console.log(preNodePool.arr);
-  // let obj = {};
-  // let preNodeId = arr.node.sourceNode.id;
-  // let judgeMainId = `${poolIndex.value}_${poolIndex.value}`;
-  // preNodePool.arr.forEach((e: any, index: any) => {
-  //   if (e == preNodeId) {
-  //     preNodePool.arr.splice(index + 1, 0, curId.value as never);
-  //     if (arr.type == "judge") {
-  //       preNodePool.arr.splice(index + 1, 0, judgeMainId as never);
-  //     }
-  //   }
-  // });
-  // preNodePoolF.arr.forEach((e: any, index: any) => {
-  //   if (e == preNodeId) {
-  //     preNodePoolF.arr.splice(index + 1, 0, (curId.value + 1) as never);
-  //     if (arr.type == "judge") {
-  //       preNodePoolF.arr.splice(index + 1, 0, judgeMainId as never);
-  //     }
-  //   }
-  // });
-  // if (arr.type == "judge") {
-  //   if (JSON.stringify(judgeNodePool.child) === "{}") {
-  //     obj = {
-  //       id: poolIndex.value,
-  //       linkId: `${poolIndex.value}_${poolIndex.value}`,
-  //       opts: [preNodePool, preNodePoolF],
-  //       child: {},
-  //     };
-  //     judgeNodePool.child = obj;
-  //   } else {
-  //     setPrePool(judgeNodePool.child);
-  //   }
-  // }
-  // console.log(preNodePool.arr);
-  // console.log(preNodePoolF.arr);
-  // // console.log(judgeNodePool.child);
-
   let indexId = arr.node.targetNode.id;
   for (let i = 0; i < nodes.arr.length; i++) {
     if (indexId == nodes.arr[i].id) {
@@ -329,34 +379,6 @@ const getJudgeOneSite = (val: any) => {
     y: val.y,
   };
 };
-const reLinkJudge = (val: any) => {
-  let linkName = `e_${poolIndex.value}_${poolIndex.value}`;
-  let linkInfo = val.node.options;
-  let linkId = linkInfo.id;
-  let linkS = ref();
-  let linkT = ref();
-  edges.arr.forEach((e: any) => {
-    if (e.id == linkId) {
-      linkS.value = e.source;
-      linkT.value = e.target;
-    }
-  });
-  edges.arr.forEach((e: any) => {
-    if (e.source == linkS.value) {
-      e.target = `${poolIndex.value}_${poolIndex.value}`;
-    }
-    if (e.target == linkT.value) {
-      e.source = linkId;
-    }
-  });
-  let obj = {
-    id: linkName,
-    source: `${poolIndex.value}_${poolIndex.value}`,
-    target: linkT.value,
-    Class: EdgeClass,
-  };
-  edges.arr.push(obj);
-};
 
 onMounted(() => {
   let dom = document.getElementById("container");
@@ -383,20 +405,20 @@ onMounted(() => {
   canvas.on("getAdd", (data: any) => {
     if (data.type == "judge") {
       canvas.addNode(addNodeJudge(data));
-      reOrder(null);
       canvas.addNode(addNode(data));
-      reOrder(null);
-      reLinkJudge(data);
+      addEdge();
+      reOrder(data);
       canvas.redraw({
         nodes: nodes.arr,
-        edges: addEdge(data, edges, data.type),
+        edges: edges.arr,
       });
     } else {
       canvas.addNode(addNode(data));
-      reOrder(null);
+      addEdge();
+      reOrder(data);
       canvas.redraw({
         nodes: nodes.arr,
-        edges: addEdge(data, edges, null),
+        edges: edges.arr,
       });
     }
   });
