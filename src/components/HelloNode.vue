@@ -94,16 +94,21 @@ const getSite = (val: any) => {
   });
   return num.form;
 };
-const getPreSite = (val: any) => {
+const getPreSite = (val: any, arr?: any) => {
+  // console.log(arr)
+  // console.log(val)
+  // console.log(preNodePool.arr)
+  // 判读末端
+
   if (val == 1) {
     return {
-      top: 0,
+      top: 10,
       left: (document.body.clientWidth - 240) / 2,
     };
   }
   if (val == 9999) {
     return {
-      top: 380,
+      top: 1000,
       left: (document.body.clientWidth - 240) / 2,
     };
   }
@@ -157,7 +162,7 @@ const reOrder = (val: any) => {
   // console.log(nodes.arr);
   // console.log(judgePool.arr)
   let nodeW = "240";
-  let nodeH = "100";
+  let nodeH = "70";
   let aNodeW = "30";
   let aNodeH = "30";
   let site = "30";
@@ -173,6 +178,8 @@ const reOrder = (val: any) => {
   lArr.arr = aArr[0].arr;
   rArr.arr = aArr[1].arr;
   nodes.arr.forEach((e: any) => {
+    e.x = getPreSite(e.id).top;
+    e.y = getPreSite(e.id).left;
     if (e.type == "judge") {
       let obj = getSite(e);
       e.x = obj.top;
@@ -188,10 +195,12 @@ const reOrder = (val: any) => {
         }
       });
     } else {
-      e.x = top.value;
-      e.y = getPreSite(e.id).left;
-      top.value =
-        Number(top.value) + Number(nodeH) + Number(aNodeH) + Number(site);
+      if (e.id != 9999) {
+        e.x = top.value + e.x;
+        top.value = Number(nodeH) + Number(aNodeH) + Number(site);
+      } else {
+        e.x = Number(getPreSite(e.id).top);
+      }
     }
   });
 };
