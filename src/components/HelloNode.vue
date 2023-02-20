@@ -95,10 +95,11 @@ const getSite = (val: any) => {
   return num.form;
 };
 const getPreSite = (val: any, arr?: any) => {
-  // console.log(arr)
-  // console.log(val)
-  // console.log(preNodePool.arr)
-  // 判读末端
+  // 判读末端高度
+  let maxHeight = ref(0)
+  console.log(preNodePool.arr)
+  console.log(nodes.arr[nodes.arr.length -2].x)
+  maxHeight.value = nodes.arr[nodes.arr.length -2].x > maxHeight.value ? nodes.arr[nodes.arr.length -2].x : maxHeight.value
 
   if (val == 1) {
     return {
@@ -108,7 +109,7 @@ const getPreSite = (val: any, arr?: any) => {
   }
   if (val == 9999) {
     return {
-      top: 1000,
+      top: maxHeight.value + 240,
       left: (document.body.clientWidth - 240) / 2,
     };
   }
@@ -199,7 +200,7 @@ const reOrder = (val: any) => {
         e.x = top.value + e.x;
         top.value = Number(nodeH) + Number(aNodeH) + Number(site);
       } else {
-        e.x = Number(getPreSite(e.id).top);
+        e.x = Number(getPreSite(e.id).top) + Number(aNodeH)+ Number(site);
       }
     }
   });
@@ -400,7 +401,7 @@ onMounted(() => {
       //主题
       edge: {
         arrow: true,
-        shapeType: "AdvancedBezier", //Manhattan
+        shapeType: "Flow", //Flow
         hasRadius: true,
         arrowPosition: 0.6,
         arrowOffset: 20,
