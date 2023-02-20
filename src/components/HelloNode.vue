@@ -14,7 +14,6 @@
 import { ref, onMounted, reactive } from "vue";
 import { Canvas, Edge } from "butterfly-dag";
 import "butterfly-dag/dist/index.css";
-
 import NodeClassInit from "./node/nodeInit/node";
 import NodeClassReview from "./node/nodeReview/node";
 import NodeClassSend from "./node/nodeSend/node";
@@ -23,7 +22,6 @@ import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
 import { ja, pa } from "element-plus/es/locale";
-
 const dialogVisible = ref(false);
 const nodeInfo = reactive({ arr: [] });
 const title = ref();
@@ -58,7 +56,6 @@ let nodes = reactive({
     },
   ],
 });
-
 let edges = reactive({
   arr: [
     {
@@ -69,7 +66,6 @@ let edges = reactive({
     },
   ],
 });
-
 let preNodePool = reactive({ arr: [["1", "9999"]] });
 const appCan = ref(null);
 const getSite = (val: any) => {
@@ -96,11 +92,11 @@ const getSite = (val: any) => {
 };
 const getPreSite = (val: any, arr?: any) => {
   // 判读末端高度
-  let maxHeight = ref(0)
-  console.log(preNodePool.arr)
-  console.log(nodes.arr[nodes.arr.length -2].x)
-  maxHeight.value = nodes.arr[nodes.arr.length -2].x > maxHeight.value ? nodes.arr[nodes.arr.length -2].x : maxHeight.value
-
+  let maxHeight = ref(0);
+  maxHeight.value =
+    nodes.arr[nodes.arr.length - 2].x > maxHeight.value
+      ? nodes.arr[nodes.arr.length - 2].x
+      : maxHeight.value;
   if (val == 1) {
     return {
       top: 10,
@@ -170,7 +166,6 @@ const reOrder = (val: any) => {
   // 获取屏幕宽高
   let screenH = document.body.clientHeight;
   let screenW = document.body.clientWidth;
-
   // 初始位置
   let top = ref(0);
   let aArr = planSite();
@@ -200,7 +195,7 @@ const reOrder = (val: any) => {
         e.x = top.value + e.x;
         top.value = Number(nodeH) + Number(aNodeH) + Number(site);
       } else {
-        e.x = Number(getPreSite(e.id).top) + Number(aNodeH)+ Number(site);
+        e.x = Number(getPreSite(e.id).top) + Number(aNodeH) + Number(site);
       }
     }
   });
@@ -242,7 +237,6 @@ const reNode = (type: any, id: any, val: any) => {
     nodes.arr = nNode;
   }
 };
-
 let curId = ref(10);
 const getId = () => {
   curId.value = new Date().getTime().toString() as never;
@@ -274,7 +268,6 @@ const addEdge = () => {
 };
 const priority = ref(2);
 const poolIndex = ref(0);
-
 const addNode = (arr: any) => {
   getId();
   let nodeId = curId.value;
@@ -337,7 +330,7 @@ const addNode = (arr: any) => {
     pool.linkId = `${poolIndex.value}_${poolIndex.value}`;
     let obj = {
       id: curId.value + 1,
-      label: `条件分支_${priority.value}`,
+      label: `条件分支_${(Number(curId.value)+1).toString().slice(-4)}`,
       priority: priority.value,
       priorityTitle: `优先级_${priority.value}`,
       x: 0,
@@ -350,7 +343,7 @@ const addNode = (arr: any) => {
     --priority.value;
     let obj1 = {
       id: curId.value,
-      label: `条件分支_${priority.value}`,
+      label: `条件分支_${curId.value.toString().slice(-4)}`,
       priority: priority.value,
       priorityTitle: `优先级_${priority.value}`,
       x: 0,
@@ -389,7 +382,6 @@ const getJudgeOneSite = (val: any) => {
     y: val.y,
   };
 };
-
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
