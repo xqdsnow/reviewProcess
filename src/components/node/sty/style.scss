@@ -14,23 +14,23 @@
 .w-icon-user,
 .w-icon-link,
 .w-icon-asterisk {
-  font-size: 16px;
+  font-size: 'xx-small';
   padding: 4px 5px;
 }
 
 .def {
   position: absolute;
-  width: 240px;
+  width: 200px;
   height: 70px;
   text-align: center;
   color: white;
   border-radius: 5%;
-  font-size: 14;
+  font-size: xx-small;
   cursor: pointer;
   .node-title {
-    font-size: 16px;
+    font-size: xx-small;
     position: relative;
-    top: 4px;
+    top: 2px;
     right: 0px;
     .w-icon-user,
     .w-icon-link,
@@ -43,8 +43,8 @@
     width: 30px;
     height: 30px;
     position: relative;
-    top: -74px;
-    right: -210px;
+    top: -70px;
+    right: -170px;
   }
   .def-head {
     height: 50px;

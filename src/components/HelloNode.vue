@@ -21,7 +21,6 @@ import NodeClassJudgeAdd from "./node/nodeJudgeAdd/node";
 import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
-import { ja, pa } from "element-plus/es/locale";
 const dialogVisible = ref(false);
 const nodeInfo = reactive({ arr: [] });
 const title = ref();
@@ -129,50 +128,41 @@ const getPreSite = (val: any, arr?: any) => {
   });
   return num.form;
 };
-const planSite = (val?: any) => {
-  let data = val == null ? nodes.arr : val;
-  let i = ref(0);
-  let arr = reactive({ arr: [] });
-  data.forEach((e: any) => {
-    if (e.type == "judge") {
-      ++i.value;
-      arr.arr.push(e as never);
-    }
-  });
-  let lArr = reactive({ arr: [] });
-  let rArr = reactive({ arr: [] });
-  let aArr = reactive({ arr: [] });
-  // 求中位数
-  if (i.value % 2 != 0) {
+const planSite = (val: any, left: any) => {
+  let i = val.length;
+  // // 求中位数
+  if (i % 2 != 0) {
   } else {
     // 没有中位数
-    let flag = i.value / 2;
-    lArr.arr = arr.arr.slice(0, flag);
-    rArr.arr = arr.arr.slice(flag, arr.arr.length);
+    let flag = i / 2;
+    var lArr = val.slice(0, flag);
+    var rArr = val.slice(flag, val.length);
   }
-  aArr.arr.push(lArr as never, rArr as never);
-  return aArr.arr;
+  // lArr.push({
+  //   left: left,
+  // });
+  // rArr.push({
+  //   left: left,
+  // });
+  let aArr = {
+    lArr: lArr,
+    rArr: rArr,
+    left: "",
+  };
+  aArr.left = left;
+  return aArr;
 };
+
+let dArr = reactive({ a: [] });
 const reOrder = (val: any) => {
   // 获取父节点的位置
-  // console.log(parent);
-  // console.log(nodes.arr);
-  // console.log(judgePool.arr)
   let nodeW = "240";
   let nodeH = "70";
   let aNodeW = "30";
   let aNodeH = "30";
   let site = "30";
-  // 获取屏幕宽高
-  let screenH = document.body.clientHeight;
-  let screenW = document.body.clientWidth;
   // 初始位置
   let top = ref(0);
-  let aArr = planSite();
-  let lArr = reactive({ arr: [] });
-  let rArr = reactive({ arr: [] });
-  lArr.arr = aArr[0].arr;
-  rArr.arr = aArr[1].arr;
   nodes.arr.forEach((e: any) => {
     e.x = getPreSite(e.id).top;
     e.y = getPreSite(e.id).left;
@@ -180,14 +170,24 @@ const reOrder = (val: any) => {
       let obj = getSite(e);
       e.x = obj.top;
       e.y = obj.left;
-      lArr.arr.forEach((e1: any, index: any) => {
-        if (e1.id == e.id) {
-          e.y = Number(obj.left) - (index + 1) * Number(nodeW);
-        }
+      dArr.a.forEach((e1: any, index: any) => {
+        e1.lArr.forEach((e2: any, index: any) => {
+          if (e2 == e.id) {
+            e.y = Number(e1.left) + (index + 1) * Number(nodeW);
+          }
+        });
+        e1.rArr.forEach((e2: any, index: any) => {
+          if (e2 == e.id) {
+            e.y = Number(e1.left) - (index + 1) * Number(nodeW);
+          }
+        });
       });
-      rArr.arr.forEach((e1: any, index: any) => {
-        if (e1.id == e.id) {
-          e.y = Number(obj.left) + (index + 1) * Number(nodeW);
+    } else if (e.type == "judgeMian") {
+      e.x = top.value + e.x;
+      top.value = Number(nodeH) + Number(aNodeH) + Number(site);
+      judgePool.arr.forEach((e1: any) => {
+        if (e1.linkId == e.id) {
+          dArr.a.push(planSite(e1.opts, e.y) as never);
         }
       });
     } else {
@@ -199,9 +199,9 @@ const reOrder = (val: any) => {
       }
     }
   });
+  console.log(nodes.arr)
 };
 const reLink = (type: any, id: any, val: any) => {
-  // console.log(id);
   if (type == "del") {
     let arr = val.arr;
     // 需要删除的节点 上下文节点
@@ -330,7 +330,7 @@ const addNode = (arr: any) => {
     pool.linkId = `${poolIndex.value}_${poolIndex.value}`;
     let obj = {
       id: curId.value + 1,
-      label: `条件分支_${(Number(curId.value)+1).toString().slice(-4)}`,
+      label: `条件分支_${(Number(curId.value) + 1).toString().slice(-4)}`,
       priority: priority.value,
       priorityTitle: `优先级_${priority.value}`,
       x: 0,
@@ -376,12 +376,7 @@ const addNodeJudge = (arr: any) => {
   nodes.arr.splice(valueId.value, 0, obj as never);
   return nodes.arr;
 };
-const getJudgeOneSite = (val: any) => {
-  return {
-    x: val.x,
-    y: val.y,
-  };
-};
+
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
@@ -393,10 +388,12 @@ onMounted(() => {
       //主题
       edge: {
         arrow: true,
-        shapeType: "Flow", //Flow
+        shapeType: "Flow", //Bezier/Flow/Straight/Manhattan/AdvancedBezier/Bezier2-1/Bezier2-2/Bezier2-3/BrokenLine
         hasRadius: true,
         arrowPosition: 0.6,
         arrowOffset: 20,
+        orientationLimit:['top'],
+        draggable:true
       },
     },
   });

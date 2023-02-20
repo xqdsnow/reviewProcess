@@ -1,23 +1,18 @@
-.judge-add-node-con {
-    position: relative;
-    width: 240px;
-    height: 70px;
-  .judge-add-node {
-    background-color: white;
-    height: 30px;
-    width: 100px;
-    margin: 0 auto;
+.judgeNodeMain{
+  display: flex;
+  justify-content:center;
+  align-items:center;
+  .judgeNodeMain-container{
+    background-color:white;
     color: #3296fa;
-    border-radius:20px;
-    padding:3px 5px;
-    .node-title {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-evenly;
+    padding: 1px 10px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content:center;
+    align-items:center;
+    .judgeNodeMain-title{
+      margin-left: 4px;
     }
   }
-}
-.handelDom-judge{
-  
 }
