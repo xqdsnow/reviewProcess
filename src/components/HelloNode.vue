@@ -104,7 +104,7 @@ const getPreSite = (val: any, arr?: any) => {
   }
   if (val == 9999) {
     return {
-      top: maxHeight.value + 240,
+      top: maxHeight.value + 500,
       left: (document.body.clientWidth - 240) / 2,
     };
   }
@@ -138,12 +138,6 @@ const planSite = (val: any, left: any) => {
     var lArr = val.slice(0, flag);
     var rArr = val.slice(flag, val.length);
   }
-  // lArr.push({
-  //   left: left,
-  // });
-  // rArr.push({
-  //   left: left,
-  // });
   let aArr = {
     lArr: lArr,
     rArr: rArr,
@@ -154,7 +148,7 @@ const planSite = (val: any, left: any) => {
 };
 
 let dArr = reactive({ a: [] });
-const reOrder = (val: any) => {
+const reOrder = () => {
   // 获取父节点的位置
   let nodeW = "240";
   let nodeH = "70";
@@ -199,7 +193,7 @@ const reOrder = (val: any) => {
       }
     }
   });
-  console.log(nodes.arr)
+  console.log(nodes.arr);
 };
 const reLink = (type: any, id: any, val: any) => {
   if (type == "del") {
@@ -233,7 +227,8 @@ const reNode = (type: any, id: any, val: any) => {
         nNode.push(e as never);
       }
     });
-    reOrder(nNode);
+    reOrder();
+    console.log(nNode);
     nodes.arr = nNode;
   }
 };
@@ -392,8 +387,6 @@ onMounted(() => {
         hasRadius: true,
         arrowPosition: 0.6,
         arrowOffset: 20,
-        orientationLimit:['top'],
-        draggable:true
       },
     },
   });
@@ -406,7 +399,7 @@ onMounted(() => {
       canvas.addNode(addNodeJudge(data));
       canvas.addNode(addNode(data));
       addEdge();
-      reOrder(data);
+      reOrder();
       canvas.redraw({
         nodes: nodes.arr,
         edges: edges.arr,
@@ -414,7 +407,7 @@ onMounted(() => {
     } else {
       canvas.addNode(addNode(data));
       addEdge();
-      reOrder(data);
+      reOrder();
       canvas.redraw({
         nodes: nodes.arr,
         edges: edges.arr,
@@ -422,17 +415,21 @@ onMounted(() => {
     }
   });
   canvas.on("getDelJudge", (data: any) => {
-    // console.log(data)
-    // canvas.removeNode(data.delId);
-    canvas.removeNode(data.delId);
-    reNode("single", data.delId, nodes.arr);
-    canvas.redraw({
-      nodes: nodes.arr,
-      edges: reLink("del", data.delId, edges),
-    });
+    console.log(data.delId)
   });
   canvas.on("getDel", (data: any) => {
     canvas.removeNode(data.delId);
+    let arr = preNodePool.arr;
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].indexOf(data.delId) != -1) {
+        for (let j = 0; j < arr[i].length; j++) {
+          if (arr[i][j] == data.delId) {
+            arr[i].splice(j, 1);
+          }
+        }
+      }
+    }
+    preNodePool.arr = arr;
     reNode("single", data.delId, nodes.arr);
     canvas.redraw({
       nodes: nodes.arr,
