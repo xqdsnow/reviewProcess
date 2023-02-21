@@ -21,6 +21,8 @@ import NodeClassJudgeAdd from "./node/nodeJudgeAdd/node";
 import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
+import { main } from "@popperjs/core";
+import { ja } from "element-plus/es/locale";
 const dialogVisible = ref(false);
 const nodeInfo = reactive({ arr: [] });
 const title = ref();
@@ -31,7 +33,7 @@ const handleCancel = () => {
   dialogVisible.value = false;
 };
 const confirm = () => {
-  console.log(nodeInfo.arr);
+  // console.log(nodeInfo.arr);
   // handleCancel();
 };
 // 单节点
@@ -193,7 +195,6 @@ const reOrder = () => {
       }
     }
   });
-  console.log(nodes.arr);
 };
 const reLink = (type: any, id: any, val: any) => {
   if (type == "del") {
@@ -220,6 +221,7 @@ const reLink = (type: any, id: any, val: any) => {
   }
 };
 const reNode = (type: any, id: any, val: any) => {
+  console.log(id);
   if (type == "single") {
     let nNode = reactive([]);
     val.forEach((e: any) => {
@@ -228,8 +230,10 @@ const reNode = (type: any, id: any, val: any) => {
       }
     });
     reOrder();
-    console.log(nNode);
     nodes.arr = nNode;
+  }
+  if (type == "double") {
+    let nNode = reactive([]);
   }
 };
 let curId = ref(10);
@@ -371,7 +375,6 @@ const addNodeJudge = (arr: any) => {
   nodes.arr.splice(valueId.value, 0, obj as never);
   return nodes.arr;
 };
-
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
@@ -415,7 +418,61 @@ onMounted(() => {
     }
   });
   canvas.on("getDelJudge", (data: any) => {
-    console.log(data.delId)
+    // 找到当前多分枝的数量
+    let jNum = ref();
+    let linkId = ref();
+    let jArr = reactive({ arr: [] });
+    judgePool.arr.forEach((e: any) => {
+      if (e.opts.indexOf(data.delId) != -1) {
+        jNum.value = e.opts.length;
+        linkId.value = e.linkId;
+        jArr.arr = e.opts;
+      }
+    });
+    // +++
+    canvas.removeNode(linkId.value);
+    jArr.arr.forEach((e: any) => {
+      canvas.removeNode(e);
+    });
+    // +++
+    jArr.arr.splice(jArr.arr.indexOf(data.delId as never), 1); // 筛除当前点击id
+    if (jNum.value > 2) {
+    } else {
+      preNodePool.arr.forEach((e: any, index: any) => {
+        // 点击次分支
+        if (e[0] == linkId.value && e.indexOf(data.delId) != -1) {
+          preNodePool.arr.splice(index, 1);
+          jArr.arr.forEach((e1: any, index1: any) => {
+            preNodePool.arr[0].splice(e.indexOf(e1) - 2, 2);
+          });
+        }
+        // 点击主分支
+        if (e[0] == "1" && e.indexOf(data.delId) != -1) {
+          preNodePool.arr[0].splice(e.indexOf(data.delId) - 1, 2);
+        }
+        jArr.arr.forEach((e1: any, index1: any) => {
+          if (e[0] == linkId.value) {
+            preNodePool.arr.splice(index, 1);
+          }
+        });
+      });
+      let jjArr = reactive({ arr: [] });
+      judgePool.arr.forEach((e: any) => {
+        if (e.opts.indexOf(data.delId) != -1) {
+          jjArr.arr = e.opts;
+        }
+      });
+      // reNode("double", jjArr.arr, nodes.arr);
+      canvas.redraw({
+        nodes: nodes.arr,
+        edges: reLink("del", data.delId, edges),
+      });
+
+      // console.log(nodes.arr);
+      // console.log(edges.arr);
+      // console.log(preNodePool.arr);
+      // console.log(judgePool.arr);
+    }
   });
   canvas.on("getDel", (data: any) => {
     canvas.removeNode(data.delId);
