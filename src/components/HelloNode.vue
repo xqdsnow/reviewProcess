@@ -21,8 +21,8 @@ import NodeClassJudgeAdd from "./node/nodeJudgeAdd/node";
 import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
-import { main } from "@popperjs/core";
 import { ja } from "element-plus/es/locale";
+
 const dialogVisible = ref(false);
 const nodeInfo = reactive({ arr: [] });
 const title = ref();
@@ -92,6 +92,7 @@ const getSite = (val: any) => {
   return num.form;
 };
 const getPreSite = (val: any, arr?: any) => {
+  console.log(val);
   // 判读末端高度
   let maxHeight = ref(0);
   maxHeight.value =
@@ -112,8 +113,8 @@ const getPreSite = (val: any, arr?: any) => {
   }
   let num = reactive({
     form: {
-      top: "",
-      left: "",
+      top: 0,
+      left: 0,
     },
   });
   let curId = ref("");
@@ -122,7 +123,10 @@ const getPreSite = (val: any, arr?: any) => {
       curId.value = e.source;
     }
   });
+
   nodes.arr.forEach((e: any) => {
+    console.log(e.id, curId.value);
+    console.log(e.id == curId.value);
     if (e.id == curId.value) {
       num.form.top = e.x;
       num.form.left = e.y;
@@ -148,7 +152,15 @@ const planSite = (val: any, left: any) => {
   aArr.left = left;
   return aArr;
 };
-
+const getErrNode = (val: any) => {
+  console.log(nodes.arr);
+  for (let i = 0; i < nodes.arr.length; i++) {
+    if (nodes.arr[i].id == val) {
+      console.log(nodes.arr[i - 1]);
+      return nodes.arr[i - 1];
+    }
+  }
+};
 let dArr = reactive({ a: [] });
 const reOrder = () => {
   // 获取父节点的位置
@@ -160,8 +172,15 @@ const reOrder = () => {
   // 初始位置
   let top = ref(0);
   nodes.arr.forEach((e: any) => {
-    e.x = getPreSite(e.id).top;
-    e.y = getPreSite(e.id).left;
+    // 节点无法衔接
+    if (getPreSite(e.id).left == "") {
+      e.x = getErrNode(e.id).x + Number(aNodeH)
+      e.y = getErrNode(e.id).y
+    } else {
+      e.x = getPreSite(e.id).top;
+      e.y = getPreSite(e.id).left;
+    }
+
     if (e.type == "judge") {
       let obj = getSite(e);
       e.x = obj.top;
@@ -216,12 +235,11 @@ const reLink = (type: any, id: any, val: any) => {
     });
     // edges 重新赋值
     edges.arr = arr;
-    reOrder(null);
+    reOrder();
     return edges.arr;
   }
 };
 const reNode = (type: any, id: any, val: any) => {
-  console.log(id);
   if (type == "single") {
     let nNode = reactive([]);
     val.forEach((e: any) => {
@@ -234,6 +252,18 @@ const reNode = (type: any, id: any, val: any) => {
   }
   if (type == "double") {
     let nNode = reactive([]);
+    val.forEach((e: any) => {
+      if (id.indexOf(e.id) == -1) {
+        // console.log(e)
+        nNode.push(e as never);
+      }
+      if (e.id == "9999") {
+        nNode.push(e as never);
+      }
+    });
+    // console.log(nNode)
+    nodes.arr = nNode;
+    reOrder();
   }
 };
 let curId = ref(10);
@@ -244,6 +274,8 @@ const getId = () => {
 // 条件分支
 const judgePool = reactive({ arr: [] });
 const addEdge = () => {
+  edges.arr.length = 0;
+  // console.log(preNodePool.arr)
   let pool = reactive({ arr: [] });
   let data = preNodePool.arr.flat();
   for (let i = 0; i < data.length - 1; i++) {
@@ -430,49 +462,73 @@ onMounted(() => {
       }
     });
     // +++
-    canvas.removeNode(linkId.value);
-    jArr.arr.forEach((e: any) => {
-      canvas.removeNode(e);
-    });
+    // console.log(data.delId);
+    // +++ 主分支
+    let curPoint = ref();
+    let curPointScoure = reactive({ arr: [] });
+    let curPointTarget = reactive({ arr: [] });
     // +++
-    jArr.arr.splice(jArr.arr.indexOf(data.delId as never), 1); // 筛除当前点击id
-    if (jNum.value > 2) {
-    } else {
-      preNodePool.arr.forEach((e: any, index: any) => {
-        // 点击次分支
-        if (e[0] == linkId.value && e.indexOf(data.delId) != -1) {
-          preNodePool.arr.splice(index, 1);
-          jArr.arr.forEach((e1: any, index1: any) => {
-            preNodePool.arr[0].splice(e.indexOf(e1) - 2, 2);
+    // 中枢节点
+    let curMainPool = reactive({ arr: [] });
+    preNodePool.arr.forEach((p: any, pindex: any) => {
+      if (p.indexOf(data.delId) != -1) {
+        // 该分支下所有的中枢节点
+        // 查找delId所属的分支
+        if (p[0] == "1") {
+          // **** 情况1 主分支 *****
+          p.find(function (val: any, index: any) {
+            // 筛选 linkid 在分支的位置
+            if (val == linkId.value) {
+              curPoint.value = index;
+            }
           });
+          // 筛选 _ 元素 ｜ 头元素
+          curPointScoure.arr = p.slice(0, curPoint.value);
+          curPointTarget.arr = p.slice(curPoint.value, p.length);
+          curPointTarget.arr.forEach((c: any, cindex: any) => {
+            if (c.indexOf("_") != -1) {
+              curMainPool.arr.push(c as never);
+            }
+            jArr.arr.push(c as never);
+          });
+        } else {
+          // 其余分支
         }
-        // 点击主分支
-        if (e[0] == "1" && e.indexOf(data.delId) != -1) {
-          preNodePool.arr[0].splice(e.indexOf(data.delId) - 1, 2);
-        }
-        jArr.arr.forEach((e1: any, index1: any) => {
-          if (e[0] == linkId.value) {
-            preNodePool.arr.splice(index, 1);
+      }
+    });
+    // 主分支
+    preNodePool.arr[0] = curPointScoure.arr;
+    preNodePool.arr.forEach((p: any, pindex: any) => {
+      if (p[0] == linkId.value) {
+        p.forEach((e: any, index: any) => {
+          if (index > 1) {
+            preNodePool.arr[0].push(e);
           }
         });
-      });
-      let jjArr = reactive({ arr: [] });
-      judgePool.arr.forEach((e: any) => {
-        if (e.opts.indexOf(data.delId) != -1) {
-          jjArr.arr = e.opts;
-        }
-      });
-      // reNode("double", jjArr.arr, nodes.arr);
-      canvas.redraw({
-        nodes: nodes.arr,
-        edges: reLink("del", data.delId, edges),
-      });
+        preNodePool.arr.splice(pindex, 1);
+      }
+    });
+    jArr.arr = [...new Set(jArr.arr)];
+    canvas.removeNode(linkId.value);
+    jArr.arr.forEach((e: any) => {
+      if (e != "9999") {
+        canvas.removeNode(e);
+      }
+    });
+    // +++
+    // 主分支 自节点 删除
+    // console.log(jArr.arr);
 
-      // console.log(nodes.arr);
-      // console.log(edges.arr);
-      // console.log(preNodePool.arr);
-      // console.log(judgePool.arr);
-    }
+    reNode("double", jArr.arr, nodes.arr);
+    canvas.redraw({
+      nodes: nodes.arr,
+      edges: addEdge(),
+    });
+
+    // console.log(preNodePool.arr);
+    // console.log(edges.arr);
+    // console.log(nodes.arr);
+    // console.log(judgePool.arr);
   });
   canvas.on("getDel", (data: any) => {
     canvas.removeNode(data.delId);
