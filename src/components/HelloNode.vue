@@ -22,6 +22,7 @@ import NodeClassJudge from "./node/nodeJudge/node";
 import NodeClassEnd from "./node/nodeEnd/node";
 import EdgeClass from "./edge/addEdge/edge";
 import { ja } from "element-plus/es/locale";
+import { del } from "vue-demi";
 
 const dialogVisible = ref(false);
 const nodeInfo = reactive({ arr: [] });
@@ -168,14 +169,10 @@ const reOrder = () => {
   let top = ref(0);
   nodes.arr.forEach((e: any) => {
     // 节点无法衔接
-    if (getPreSite(e.id).left == "" ) {
+    if (getPreSite(e.id).left == "") {
       e.x = getErrNode(e.id).x + Number(aNodeH);
       e.y = getErrNode(e.id).y;
-    } else if(getPreSite(e.id).top == ""){
-      // e.x = getErrNode(e.id).x;
-      // e.y = getErrNode(e.id).y;
-      // e.x = 100
-    }else {
+    } else {
       e.x = getPreSite(e.id).top;
       e.y = getPreSite(e.id).left;
     }
@@ -403,6 +400,22 @@ const addNodeJudge = (arr: any) => {
   nodes.arr.splice(valueId.value, 0, obj as never);
   return nodes.arr;
 };
+let jLinkPool = reactive({ arr: [] });
+const cirGet = (arr: any, val: any) => {
+  jLinkPool.arr.push(val as never);
+  arr.forEach((e: any, index: any) => {
+    if (e.indexOf("_") != -1 && e != val) {
+      preNodePool.arr.forEach((p: any, pindex: any) => {
+        if (p[0] == e) {
+          jLinkPool.arr.push(e as never);
+          cirGet(p, e);
+        }
+      });
+    } else {
+      return;
+    }
+  });
+};
 onMounted(() => {
   let dom = document.getElementById("container");
   let canvas = new Canvas({
@@ -445,103 +458,203 @@ onMounted(() => {
       });
     }
   });
+  // canvas.on("getDelJudge", (data: any) => {
+  //   // 找到当前多分枝的数量
+  //   let jNum = ref();
+  //   let linkId = ref();
+  //   let jArr = reactive({ arr: [] });
+  //   judgePool.arr.forEach((e: any) => {
+  //     if (e.opts.indexOf(data.delId) != -1) {
+  //       jNum.value = e.opts.length;
+  //       linkId.value = e.linkId;
+  //       jArr.arr = e.opts;
+  //     }
+  //   });
+  //   // +++
+  //   // +++ 主分支
+  //   let curPoint = ref();
+  //   let curPointScoure = reactive({ arr: [] });
+  //   let curPointTarget = reactive({ arr: [] });
+  //   let isCen = ref(true);
+  //   // +++
+  //   // 中枢节点
+  //   let curMainPool = reactive({ arr: [] });
+  //   preNodePool.arr.forEach((p: any, pindex: any) => {
+  //     if (p.indexOf(data.delId) != -1) {
+  //       // 该分支下所有的中枢节点
+  //       // 查找delId所属的分支
+  //       if (p[0] == "1") {
+  //         isCen.value = true;
+  //         // **** 情况1 主分支 *****
+  //         p.find(function (val: any, index: any) {
+  //           // 筛选 linkid 在分支的位置
+  //           if (val == linkId.value) {
+  //             curPoint.value = index;
+  //           }
+  //         });
+  //         // 筛选 _ 元素 ｜ 头元素
+  //         curPointScoure.arr = p.slice(0, curPoint.value);
+  //         curPointTarget.arr = p.slice(curPoint.value, p.length);
+  //         curPointTarget.arr.forEach((c: any, cindex: any) => {
+  //           if (c.indexOf("_") != -1) {
+  //             curMainPool.arr.push(c as never);
+  //           }
+  //           jArr.arr.push(c as never);
+  //         });
+  //       } else {
+  //         // 其余分支
+  //         isCen.value = false;
+  //         if(p[0] == linkId.value) {
+  //           console.log(p)
+  //         }
+  //         // curPointTarget.arr.forEach((c: any, cindex: any) => {
+  //         //   if (c.indexOf("_") != -1) {
+  //         //     curMainPool.arr.push(c as never);
+  //         //   }
+  //         //   jArr.arr.push(c as never);
+  //         // });
+  //       }
+  //     }
+  //   });
+  //   // 主分支
+  //   if (isCen.value) {
+  //     preNodePool.arr[0] = curPointScoure.arr;
+  //     preNodePool.arr.forEach((p: any, pindex: any) => {
+  //       if (p[0] == linkId.value) {
+  //         p.forEach((e: any, index: any) => {
+  //           if (index > 1) {
+  //             preNodePool.arr[0].push(e);
+  //           }
+  //         });
+  //         preNodePool.arr.splice(pindex, 1);
+  //       }
+  //     });
+  //     jArr.arr = [...new Set(jArr.arr)];
+  //     canvas.removeNode(linkId.value);
+  //     jArr.arr.forEach((e: any) => {
+  //       if (e != "9999") {
+  //         canvas.removeNode(e);
+  //       }
+  //     });
+  //     reNode("double", jArr.arr, nodes.arr);
+  //     canvas.redraw({
+  //       nodes: nodes.arr,
+  //       edges: addEdge(),
+  //     });
+  //   } else {
+  //   }
+
+  //   // console.log(preNodePool.arr);
+  //   // console.log(edges.arr);
+  //   // console.log(nodes.arr);
+  //   // console.log(judgePool.arr);
+  // });
   canvas.on("getDelJudge", (data: any) => {
-    // 找到当前多分枝的数量
-    let jNum = ref();
+    jLinkPool.arr.length = 0;
+    let delId = data.delId;
+    // 首次点击的中枢- 截取
     let linkId = ref();
-    let jArr = reactive({ arr: [] });
-    judgePool.arr.forEach((e: any) => {
-      if (e.opts.indexOf(data.delId) != -1) {
-        jNum.value = e.opts.length;
-        linkId.value = e.linkId;
-        jArr.arr = e.opts;
+    let delOpts = reactive({ arr: [] });
+
+    const delNodePool = reactive({ arr: [] });
+    // 记录主轴切割点
+    let curIndex = ref();
+    let curScope = reactive({ arr: [] });
+    let curScopeDel = reactive({ arr: [] });
+    //
+    judgePool.arr.forEach((j: any, jindex: any) => {
+      if (j.opts.indexOf(delId) != -1) {
+        linkId.value = j.linkId;
+        delOpts.arr = j.opts;
+        delNodePool.arr.push(j.opts as never);
       }
     });
-    // +++
-    // +++ 主分支
-    let curPoint = ref();
-    let curPointScoure = reactive({ arr: [] });
-    let curPointTarget = reactive({ arr: [] });
-    let isCen = ref(true);
-    // +++
-    // 中枢节点
-    let curMainPool = reactive({ arr: [] });
+    // 找到主轴需要拼接的数据
     preNodePool.arr.forEach((p: any, pindex: any) => {
-      if (p.indexOf(data.delId) != -1) {
-        // 该分支下所有的中枢节点
-        // 查找delId所属的分支
-        if (p[0] == "1") {
-          isCen.value = true;
-          // **** 情况1 主分支 *****
-          p.find(function (val: any, index: any) {
-            // 筛选 linkid 在分支的位置
-            if (val == linkId.value) {
-              curPoint.value = index;
+      // 遍历中枢
+      if (p.indexOf(linkId.value) != -1 && p.indexOf(delId) != -1) {
+        curIndex.value = p.indexOf(linkId.value);
+        curScope.arr = p.slice(0, curIndex.value);
+        curScopeDel.arr = p.slice(curIndex.value);
+        cirGet(p.slice(p.indexOf(linkId.value)), linkId.value);
+      }
+    });
+    delNodePool.arr.push(curScopeDel.arr as never);
+    // console.log(curIndex.value, curScope.arr, curScopeDel.arr);
+    jLinkPool.arr = [...new Set(jLinkPool.arr)];
+    // 以下节点全删除
+    const delIndex = reactive({ arr: [] });
+    preNodePool.arr.forEach((p: any, pindex: any) => {
+      jLinkPool.arr.forEach((j: any, jindex: any) => {
+        if (p.indexOf(j) != -1 && p.indexOf(delId) != -1) {
+          if (p[0] == j) {
+            delNodePool.arr.push(p as never);
+            delIndex.arr.push(pindex as never);
+          } else {
+            if (p.indexOf(delId) != -1) {
+              delNodePool.arr.push(p.slice(p.indexOf(j)) as never);
             }
-          });
-          // 筛选 _ 元素 ｜ 头元素
-          curPointScoure.arr = p.slice(0, curPoint.value);
-          curPointTarget.arr = p.slice(curPoint.value, p.length);
-          curPointTarget.arr.forEach((c: any, cindex: any) => {
-            if (c.indexOf("_") != -1) {
-              curMainPool.arr.push(c as never);
-            }
-            jArr.arr.push(c as never);
-          });
-        } else {
-          // 其余分支
-          isCen.value = false;
-          if (p[0] == linkId.value) {
-            // 确定当前分支
-            p.forEach((e1: any, index1: any) => {
-              // 放入删除池
-              jArr.arr.push(e1 as never);
-              // _
-              if (e1.indexOf("_") != -1) {
-                curMainPool.arr.push(e1 as never);
-              }
-            });
           }
         }
+      });
+    });
+    delNodePool.arr = [...new Set(delNodePool.arr.flat())];
+    // console.log(delNodePool.arr)
+    // curIndex linkId 找未删除节点的父节点
+    let nNode = ref();
+    delOpts.arr.forEach((e: any) => {
+      if (e != delId) {
+        nNode.value = e;
       }
     });
-    console.log(preNodePool.arr);
-    jArr.arr = [...new Set(jArr.arr)];
-    console.log(jArr.arr);
-    console.log(curMainPool.arr);
-    // 主分支
-    if (isCen.value) {
-      preNodePool.arr[0] = curPointScoure.arr;
-      preNodePool.arr.forEach((p: any, pindex: any) => {
-        if (p[0] == linkId.value) {
-          p.forEach((e: any, index: any) => {
-            if (index > 1) {
-              preNodePool.arr[0].push(e);
-            }
-          });
-          preNodePool.arr.splice(pindex, 1);
+    let head = reactive({ arr: [] });
+    let tar = reactive({ arr: [] });
+    preNodePool.arr.forEach((p: any, pindex: any) => {
+      if (p.indexOf(nNode.value) != -1) {
+        // 后驱数据
+        tar.arr = p.slice(p.indexOf(nNode.value) + 1);
+      }
+      if (p.indexOf(linkId.value) != -1) {
+        if (p[0] != linkId.value) {
+          //前驱数据
+          head.arr = p.slice(0, p.indexOf(linkId.value));
+        }
+      }
+    });
+    // console.log(head.arr.concat(tar.arr));
+    // 删除冗余节点
+    jLinkPool.arr.forEach((j: any, jindex: any) => {
+      preNodePool.arr.map((p: any, pindex: any) => {
+        if (p.indexOf(j) != -1) {
+          p.push("del");
         }
       });
-      jArr.arr = [...new Set(jArr.arr)];
-      canvas.removeNode(linkId.value);
-      jArr.arr.forEach((e: any) => {
-        if (e != "9999") {
-          canvas.removeNode(e);
-        }
-      });
-      reNode("double", jArr.arr, nodes.arr);
-      canvas.redraw({
-        nodes: nodes.arr,
-        edges: addEdge(),
-      });
-    } else {
-    }
-    console.log("++++");
-    console.log(preNodePool.arr);
-    console.log(edges.arr);
-    console.log(nodes.arr);
-    console.log(judgePool.arr);
-    console.log("++++");
+    });
+    preNodePool.arr = preNodePool.arr.filter(function (e: any) {
+      if (e.indexOf("del") == -1) {
+        return e;
+      }
+    });
+    preNodePool.arr.push(head.arr.concat(tar.arr));
+    // 重新排序节点
+    delNodePool.arr.forEach((e: any) => {
+      if (e != "9999") {
+        canvas.removeNode(e);
+      }
+    });
+
+    // console.log(preNodePool.arr);
+
+    reNode("double", delNodePool.arr, nodes.arr);
+    addEdge();
+    canvas.redraw({
+      nodes: nodes.arr,
+      edges: edges.arr,
+    });
+    // console.log(delNodePool.arr);
+    // console.log(delIndex.arr);
+    // console.log(curScope.arr);
+    // console.log(jLinkPool.arr);
   });
   canvas.on("getDel", (data: any) => {
     canvas.removeNode(data.delId);

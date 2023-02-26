@@ -49,13 +49,13 @@ class BaseNode extends Node {
         添加同级条件判断
     </div>`);
     let containerChild = container.children('')[0]
-    Tips.createTip({
-      targetDom: containerChild,
-      genTipDom: () => {
-        return handelDom[0];
-      },
-      placement: "bottom",
-    });
+    // Tips.createTip({
+    //   targetDom: containerChild,
+    //   genTipDom: () => {
+    //     return handelDom[0];
+    //   },
+    //   placement: "bottom",
+    // });
     return container[0];
   };
 }
