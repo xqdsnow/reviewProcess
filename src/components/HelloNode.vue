@@ -173,14 +173,11 @@ const reOrder = () => {
       let data = getErrNode(e.id);
       e.x = Number(data.x) + Number(nodeH) + Number(aNodeH) + Number(site);
       e.y = Number(data.y);
-
-      console.log(e.id);
       return;
     } else {
       e.x = getPreSite(e.id).top;
       e.y = getPreSite(e.id).left;
     }
-    console.log(e.id);
     if (e.type == "judge") {
       let obj = getSite(e);
       e.x = obj.top;
@@ -462,97 +459,6 @@ onMounted(() => {
       });
     }
   });
-  // canvas.on("getDelJudge", (data: any) => {
-  //   // 找到当前多分枝的数量
-  //   let jNum = ref();
-  //   let linkId = ref();
-  //   let jArr = reactive({ arr: [] });
-  //   judgePool.arr.forEach((e: any) => {
-  //     if (e.opts.indexOf(data.delId) != -1) {
-  //       jNum.value = e.opts.length;
-  //       linkId.value = e.linkId;
-  //       jArr.arr = e.opts;
-  //     }
-  //   });
-  //   // +++
-  //   // +++ 主分支
-  //   let curPoint = ref();
-  //   let curPointScoure = reactive({ arr: [] });
-  //   let curPointTarget = reactive({ arr: [] });
-  //   let isCen = ref(true);
-  //   // +++
-  //   // 中枢节点
-  //   let curMainPool = reactive({ arr: [] });
-  //   preNodePool.arr.forEach((p: any, pindex: any) => {
-  //     if (p.indexOf(data.delId) != -1) {
-  //       // 该分支下所有的中枢节点
-  //       // 查找delId所属的分支
-  //       if (p[0] == "1") {
-  //         isCen.value = true;
-  //         // **** 情况1 主分支 *****
-  //         p.find(function (val: any, index: any) {
-  //           // 筛选 linkid 在分支的位置
-  //           if (val == linkId.value) {
-  //             curPoint.value = index;
-  //           }
-  //         });
-  //         // 筛选 _ 元素 ｜ 头元素
-  //         curPointScoure.arr = p.slice(0, curPoint.value);
-  //         curPointTarget.arr = p.slice(curPoint.value, p.length);
-  //         curPointTarget.arr.forEach((c: any, cindex: any) => {
-  //           if (c.indexOf("_") != -1) {
-  //             curMainPool.arr.push(c as never);
-  //           }
-  //           jArr.arr.push(c as never);
-  //         });
-  //       } else {
-  //         // 其余分支
-  //         isCen.value = false;
-  //         if(p[0] == linkId.value) {
-  //           console.log(p)
-  //         }
-  //         // curPointTarget.arr.forEach((c: any, cindex: any) => {
-  //         //   if (c.indexOf("_") != -1) {
-  //         //     curMainPool.arr.push(c as never);
-  //         //   }
-  //         //   jArr.arr.push(c as never);
-  //         // });
-  //       }
-  //     }
-  //   });
-  //   // 主分支
-  //   if (isCen.value) {
-  //     preNodePool.arr[0] = curPointScoure.arr;
-  //     preNodePool.arr.forEach((p: any, pindex: any) => {
-  //       if (p[0] == linkId.value) {
-  //         p.forEach((e: any, index: any) => {
-  //           if (index > 1) {
-  //             preNodePool.arr[0].push(e);
-  //           }
-  //         });
-  //         preNodePool.arr.splice(pindex, 1);
-  //       }
-  //     });
-  //     jArr.arr = [...new Set(jArr.arr)];
-  //     canvas.removeNode(linkId.value);
-  //     jArr.arr.forEach((e: any) => {
-  //       if (e != "9999") {
-  //         canvas.removeNode(e);
-  //       }
-  //     });
-  //     reNode("double", jArr.arr, nodes.arr);
-  //     canvas.redraw({
-  //       nodes: nodes.arr,
-  //       edges: addEdge(),
-  //     });
-  //   } else {
-  //   }
-
-  //   // console.log(preNodePool.arr);
-  //   // console.log(edges.arr);
-  //   // console.log(nodes.arr);
-  //   // console.log(judgePool.arr);
-  // });
   canvas.on("getDelJudge", (data: any) => {
     jLinkPool.arr.length = 0;
     let delId = data.delId;
@@ -588,16 +494,15 @@ onMounted(() => {
     // console.log(curIndex.value, curScope.arr, curScopeDel.arr);
     jLinkPool.arr = [...new Set(jLinkPool.arr)];
     // 以下节点全删除
-    preNodePool.arr.forEach((p: any, pindex: any) => {
-      jLinkPool.arr.forEach((j: any, jindex: any) => {
+    // console.log(jLinkPool.arr);
+    // console.log(preNodePool.arr);
+    jLinkPool.arr.forEach((j: any, jindex: any) => {
+      preNodePool.arr.forEach((p: any, pindex: any) => {
         if (p.indexOf(j) != -1 && p.indexOf(delId) != -1) {
-          if (p[0] == j) {
-            delNodePool.arr.push(p as never);
-          } else {
-            if (p.indexOf(delId) != -1) {
-              delNodePool.arr.push(p.slice(p.indexOf(j)) as never);
-            }
-          }
+          delNodePool.arr.push(p.slice(p.indexOf(j)) as never);
+        }
+        if(p.indexOf(j) != -1 && p[0] == j){
+          delNodePool.arr.push(p as never);
         }
       });
     });
