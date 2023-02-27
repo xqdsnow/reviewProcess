@@ -478,7 +478,6 @@ onMounted(() => {
         delOpts.arr = j.opts;
       }
     });
-    // console.log(delOpts.arr);
     delNodePool.arr.push(delOpts.arr as never);
     // 找到主轴需要拼接的数据
     preNodePool.arr.forEach((p: any, pindex: any) => {
@@ -491,17 +490,14 @@ onMounted(() => {
       }
     });
     delNodePool.arr.push(curScopeDel.arr as never);
-    // console.log(curIndex.value, curScope.arr, curScopeDel.arr);
     jLinkPool.arr = [...new Set(jLinkPool.arr)];
     // 以下节点全删除
-    // console.log(jLinkPool.arr);
-    // console.log(preNodePool.arr);
     jLinkPool.arr.forEach((j: any, jindex: any) => {
       preNodePool.arr.forEach((p: any, pindex: any) => {
         if (p.indexOf(j) != -1 && p.indexOf(delId) != -1) {
           delNodePool.arr.push(p.slice(p.indexOf(j)) as never);
         }
-        if(p.indexOf(j) != -1 && p[0] == j){
+        if(p.indexOf(j) != -1 && p[0] == j && j != linkId.value){
           delNodePool.arr.push(p as never);
         }
       });
@@ -515,7 +511,6 @@ onMounted(() => {
       });
     });
     delNodePool.arr = [...new Set(delNodePool.arr.flat())];
-    // console.log(delNodePool.arr);
     // curIndex linkId 找未删除节点的父节点
     let nNode = ref();
     delOpts.arr.forEach((e: any) => {
@@ -537,7 +532,6 @@ onMounted(() => {
         }
       }
     });
-    // console.log(tar.arr)
     // 删除冗余节点
     jLinkPool.arr.forEach((j: any, jindex: any) => {
       preNodePool.arr.map((p: any, pindex: any) => {
@@ -559,10 +553,7 @@ onMounted(() => {
         canvas.removeNode(e);
       }
     });
-
     // console.log(preNodePool.arr);
-
-    // console.log(nodes.arr);
     reNode("double", delNodePool.arr, nodes.arr);
     addEdge();
     canvas.redraw({
