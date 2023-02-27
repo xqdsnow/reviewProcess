@@ -169,14 +169,18 @@ const reOrder = () => {
   let top = ref(0);
   nodes.arr.forEach((e: any) => {
     // 节点无法衔接
-    if (getPreSite(e.id).left == "") {
-      e.x = getErrNode(e.id).x + Number(aNodeH);
-      e.y = getErrNode(e.id).y;
+    if (!getPreSite(e.id).left) {
+      let data = getErrNode(e.id);
+      e.x = Number(data.x) + Number(nodeH) + Number(aNodeH) + Number(site);
+      e.y = Number(data.y);
+
+      console.log(e.id);
+      return;
     } else {
       e.x = getPreSite(e.id).top;
       e.y = getPreSite(e.id).left;
     }
-
+    console.log(e.id);
     if (e.type == "judge") {
       let obj = getSite(e);
       e.x = obj.top;
@@ -566,9 +570,10 @@ onMounted(() => {
       if (j.opts.indexOf(delId) != -1) {
         linkId.value = j.linkId;
         delOpts.arr = j.opts;
-        delNodePool.arr.push(j.opts as never);
       }
     });
+    // console.log(delOpts.arr);
+    delNodePool.arr.push(delOpts.arr as never);
     // 找到主轴需要拼接的数据
     preNodePool.arr.forEach((p: any, pindex: any) => {
       // 遍历中枢
@@ -583,13 +588,11 @@ onMounted(() => {
     // console.log(curIndex.value, curScope.arr, curScopeDel.arr);
     jLinkPool.arr = [...new Set(jLinkPool.arr)];
     // 以下节点全删除
-    const delIndex = reactive({ arr: [] });
     preNodePool.arr.forEach((p: any, pindex: any) => {
       jLinkPool.arr.forEach((j: any, jindex: any) => {
         if (p.indexOf(j) != -1 && p.indexOf(delId) != -1) {
           if (p[0] == j) {
             delNodePool.arr.push(p as never);
-            delIndex.arr.push(pindex as never);
           } else {
             if (p.indexOf(delId) != -1) {
               delNodePool.arr.push(p.slice(p.indexOf(j)) as never);
@@ -598,8 +601,16 @@ onMounted(() => {
         }
       });
     });
+    //
+    judgePool.arr.forEach((j: any, jIndex: any) => {
+      jLinkPool.arr.forEach((e: any, eIndex: any) => {
+        if (j.linkId == e) {
+          delNodePool.arr.push(j.opts as never);
+        }
+      });
+    });
     delNodePool.arr = [...new Set(delNodePool.arr.flat())];
-    // console.log(delNodePool.arr)
+    // console.log(delNodePool.arr);
     // curIndex linkId 找未删除节点的父节点
     let nNode = ref();
     delOpts.arr.forEach((e: any) => {
@@ -621,7 +632,7 @@ onMounted(() => {
         }
       }
     });
-    // console.log(head.arr.concat(tar.arr));
+    // console.log(tar.arr)
     // 删除冗余节点
     jLinkPool.arr.forEach((j: any, jindex: any) => {
       preNodePool.arr.map((p: any, pindex: any) => {
@@ -635,7 +646,8 @@ onMounted(() => {
         return e;
       }
     });
-    preNodePool.arr.push(head.arr.concat(tar.arr));
+    let nNodeLink = head.arr.concat(tar.arr);
+    preNodePool.arr.push(nNodeLink);
     // 重新排序节点
     delNodePool.arr.forEach((e: any) => {
       if (e != "9999") {
@@ -645,12 +657,14 @@ onMounted(() => {
 
     // console.log(preNodePool.arr);
 
+    // console.log(nodes.arr);
     reNode("double", delNodePool.arr, nodes.arr);
     addEdge();
     canvas.redraw({
       nodes: nodes.arr,
       edges: edges.arr,
     });
+    // console.log(nodes.arr);
     // console.log(delNodePool.arr);
     // console.log(delIndex.arr);
     // console.log(curScope.arr);
